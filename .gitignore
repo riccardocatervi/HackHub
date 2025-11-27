@@ -1,1 +1,6 @@
+# File di sistema
 .DS_Store
+
+# File di lock e backup di Visual Paradigm
+*.vpp.lck
+*.vpp.bak*
