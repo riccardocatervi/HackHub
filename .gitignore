@@ -4,3 +4,18 @@
 # File di lock e backup di Visual Paradigm
 *.vpp.lck
 *.vpp.bak*
+*.vpp~*
+*.vpp.~*
+*.vbak
+
+# File ausiliari Visual Paradigm
+*.vux
+
+# Metadata 
+.vpprefdata/
+teamwork_client/
+teamworkUser.xml
+.lock
+
+# File di preferenze
+.vp.*
