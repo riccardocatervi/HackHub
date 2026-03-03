@@ -25,22 +25,22 @@ import java.util.stream.Collectors;
  */
 public class HackathonService {
 
-    private final HackathonRepository     hackathonRepository;
-    private final GiudiceRepository       giudiceRepository;
-    private final MentoreRepository       mentoreRepository;
+    private final HackathonRepository hackathonRepository;
+    private final GiudiceRepository giudiceRepository;
+    private final MentoreRepository mentoreRepository;
     private final OrganizzatoreRepository organizzatoreRepository;
-    private final NotificationsService    notificationsService;
+    private final NotificationsService notificationsService;
 
     public HackathonService(HackathonRepository hackathonRepository,
                             GiudiceRepository giudiceRepository,
                             MentoreRepository mentoreRepository,
                             OrganizzatoreRepository organizzatoreRepository,
                             NotificationsService notificationsService) {
-        this.hackathonRepository     = hackathonRepository;
-        this.giudiceRepository       = giudiceRepository;
-        this.mentoreRepository       = mentoreRepository;
+        this.hackathonRepository = hackathonRepository;
+        this.giudiceRepository = giudiceRepository;
+        this.mentoreRepository = mentoreRepository;
         this.organizzatoreRepository = organizzatoreRepository;
-        this.notificationsService    = notificationsService;
+        this.notificationsService = notificationsService;
     }
 
     /**
@@ -49,15 +49,15 @@ public class HackathonService {
      */
     public HackathonFormDataDTO getFormData(UUID idOrganizzatore) {
         Organizzatore organizzatore = organizzatoreRepository.findById(idOrganizzatore)
-            .orElseThrow(() -> new RuntimeException("Organizzatore non trovato: " + idOrganizzatore));
+                .orElseThrow(() -> new RuntimeException("Organizzatore non trovato: " + idOrganizzatore));
 
         List<GiudiceDTO> giudici = giudiceRepository.findAllDisponibili().stream()
-            .map(g -> new GiudiceDTO(g.getId(), g.getNome(), g.getCognome()))
-            .collect(Collectors.toList());
+                .map(g -> new GiudiceDTO(g.getId(), g.getNome(), g.getCognome()))
+                .collect(Collectors.toList());
 
         List<MentoreDTO> mentori = mentoreRepository.findAllDisponibili().stream()
-            .map(m -> new MentoreDTO(m.getId(), m.getNome(), m.getCognome()))
-            .collect(Collectors.toList());
+                .map(m -> new MentoreDTO(m.getId(), m.getNome(), m.getCognome()))
+                .collect(Collectors.toList());
 
         String nomeOrganizzatore = organizzatore.getNome() + " " + organizzatore.getCognome();
         return new HackathonFormDataDTO(nomeOrganizzatore, giudici, mentori);
@@ -73,7 +73,7 @@ public class HackathonService {
 
         // Verifica esistenza del giudice selezionato
         Giudice giudice = giudiceRepository.findById(dto.getIdGiudice())
-            .orElseThrow(() -> new HackathonNotFoundException("Giudice non trovato: " + dto.getIdGiudice()));
+                .orElseThrow(() -> new HackathonNotFoundException("Giudice non trovato: " + dto.getIdGiudice()));
 
         if (!giudice.isDisponibile()) {
             throw new IllegalArgumentException("Il giudice selezionato non è disponibile.");
@@ -81,30 +81,30 @@ public class HackathonService {
 
         // Verifica esistenza e disponibilità di tutti i mentori selezionati
         List<Mentore> mentori = dto.getIdsMentori().stream()
-            .map(idM -> {
-                Mentore m = mentoreRepository.findById(idM)
-                    .orElseThrow(() -> new HackathonNotFoundException("Mentore non trovato: " + idM));
-                if (!m.isDisponibile()) {
-                    throw new IllegalArgumentException("Il mentore " + idM + " non è disponibile.");
-                }
-                return m;
-            })
-            .collect(Collectors.toList());
+                .map(idM -> {
+                    Mentore m = mentoreRepository.findById(idM)
+                            .orElseThrow(() -> new HackathonNotFoundException("Mentore non trovato: " + idM));
+                    if (!m.isDisponibile()) {
+                        throw new IllegalArgumentException("Il mentore " + idM + " non è disponibile.");
+                    }
+                    return m;
+                })
+                .collect(Collectors.toList());
 
         // Creazione entità: lo stato iniziale IN_ISCRIZIONE è garantito dal costruttore
         Hackathon hackathon = new Hackathon(
-            dto.getNome(),
-            dto.getDataInizio(),
-            dto.getDataFine(),
-            dto.getScadenzaIscrizioni(),
-            dto.getScadenzaSottomissioni(),
-            dto.getPremio(),
-            dto.getLuogo(),
-            dto.getDimensioneMaxTeam(),
-            dto.getRegolamento(),
-            dto.getIdOrganizzatore(),
-            dto.getIdGiudice(),
-            dto.getIdsMentori()
+                dto.getNome(),
+                dto.getDataInizio(),
+                dto.getDataFine(),
+                dto.getScadenzaIscrizioni(),
+                dto.getScadenzaSottomissioni(),
+                dto.getPremio(),
+                dto.getLuogo(),
+                dto.getDimensioneMaxTeam(),
+                dto.getRegolamento(),
+                dto.getIdOrganizzatore(),
+                dto.getIdGiudice(),
+                dto.getIdsMentori()
         );
 
         hackathonRepository.save(hackathon);
@@ -118,35 +118,35 @@ public class HackathonService {
     private void validaDate(HackathonSubmissionDTO dto) {
         if (dto.getDataInizio().isAfter(dto.getDataFine())) {
             throw new IllegalArgumentException(
-                "La data di inizio deve essere antecedente alla data di fine.");
+                    "La data di inizio deve essere antecedente alla data di fine.");
         }
         if (!dto.getScadenzaIscrizioni().isBefore(dto.getDataInizio())) {
             throw new IllegalArgumentException(
-                "La scadenza iscrizioni deve essere antecedente alla data di inizio.");
+                    "La scadenza iscrizioni deve essere antecedente alla data di inizio.");
         }
         if (dto.getScadenzaSottomissioni().isBefore(dto.getDataInizio()) ||
-            dto.getScadenzaSottomissioni().isAfter(dto.getDataFine())) {
+                dto.getScadenzaSottomissioni().isAfter(dto.getDataFine())) {
             throw new IllegalArgumentException(
-                "La scadenza sottomissioni deve essere compresa nel periodo dell'hackathon.");
+                    "La scadenza sottomissioni deve essere compresa nel periodo dell'hackathon.");
         }
     }
 
     private HackathonResponseDTO toResponseDTO(Hackathon h) {
         return new HackathonResponseDTO(
-            h.getId(),
-            h.getNome(),
-            h.getDataInizio(),
-            h.getDataFine(),
-            h.getScadenzaIscrizioni(),
-            h.getScadenzaSottomissioni(),
-            h.getPremio(),
-            h.getLuogo(),
-            h.getDimensioneMaxTeam(),
-            h.getRegolamento(),
-            h.getIdOrganizzatore(),
-            h.getIdGiudice(),
-            h.getIdMentori(),
-            h.getStatoEnum()
+                h.getId(),
+                h.getNome(),
+                h.getDataInizio(),
+                h.getDataFine(),
+                h.getScadenzaIscrizioni(),
+                h.getScadenzaSottomissioni(),
+                h.getPremio(),
+                h.getLuogo(),
+                h.getDimensioneMaxTeam(),
+                h.getRegolamento(),
+                h.getIdOrganizzatore(),
+                h.getIdGiudice(),
+                h.getIdMentori(),
+                h.getStatoEnum()
         );
     }
 }

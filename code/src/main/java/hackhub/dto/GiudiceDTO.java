@@ -9,12 +9,20 @@ public class GiudiceDTO {
     private final String cognome;
 
     public GiudiceDTO(UUID id, String nome, String cognome) {
-        this.id      = id;
-        this.nome    = nome;
+        this.id = id;
+        this.nome = nome;
         this.cognome = cognome;
     }
 
-    public UUID   getId()      { return id; }
-    public String getNome()    { return nome; }
-    public String getCognome() { return cognome; }
+    public UUID getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getCognome() {
+        return cognome;
+    }
 }

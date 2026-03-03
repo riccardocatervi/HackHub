@@ -20,19 +20,19 @@ import java.util.UUID;
  */
 public class ProclamazioneService {
 
-    private final HackathonRepository     hackathonRepository;
+    private final HackathonRepository hackathonRepository;
     private final SottomissioneRepository sottomissioneRepository;
-    private final TeamRepository          teamRepository;
-    private final NotificationsService    notificationsService;
+    private final TeamRepository teamRepository;
+    private final NotificationsService notificationsService;
 
     public ProclamazioneService(HackathonRepository hackathonRepository,
                                 SottomissioneRepository sottomissioneRepository,
                                 TeamRepository teamRepository,
                                 NotificationsService notificationsService) {
-        this.hackathonRepository     = hackathonRepository;
+        this.hackathonRepository = hackathonRepository;
         this.sottomissioneRepository = sottomissioneRepository;
-        this.teamRepository          = teamRepository;
-        this.notificationsService    = notificationsService;
+        this.teamRepository = teamRepository;
+        this.notificationsService = notificationsService;
     }
 
     /**
@@ -41,30 +41,30 @@ public class ProclamazioneService {
      */
     public ProclamazioneFormDTO preparaProclamazione(UUID idHackathon) {
         Hackathon hackathon = hackathonRepository.findById(idHackathon)
-            .orElseThrow(() -> new HackathonNotFoundException(idHackathon));
+                .orElseThrow(() -> new HackathonNotFoundException(idHackathon));
 
         // Guard del pattern State: lancia IllegalStateTransitionException se non IN_VALUTAZIONE
         hackathon.verificaAccettaProclamazione();
 
         Sottomissione candidataVincitrice = sottomissioneRepository.findVincitore(idHackathon)
-            .orElseThrow(() -> new RuntimeException(
-                "Nessuna sottomissione valutata trovata per l'hackathon: " + idHackathon));
+                .orElseThrow(() -> new RuntimeException(
+                        "Nessuna sottomissione valutata trovata per l'hackathon: " + idHackathon));
 
         Team teamVincitore = teamRepository.findById(candidataVincitrice.getIdTeam())
-            .orElseThrow(() -> new TeamNotFoundException(candidataVincitrice.getIdTeam()));
+                .orElseThrow(() -> new TeamNotFoundException(candidataVincitrice.getIdTeam()));
 
         return new ProclamazioneFormDTO(
-            hackathon.getId(),
-            hackathon.getNome(),
-            teamVincitore.getId(),
-            teamVincitore.getNome(),
-            hackathon.getPremio()
+                hackathon.getId(),
+                hackathon.getNome(),
+                teamVincitore.getId(),
+                teamVincitore.getNome(),
+                hackathon.getPremio()
         );
     }
 
     /**
      * Esegue la proclamazione ufficiale del team vincitore.
-     *
+     * <p>
      * Passi:
      * 1. Carica l'hackathon e verifica lo stato tramite il pattern State.
      * 2. Individua la sottomissione con il voto più alto.
@@ -74,17 +74,17 @@ public class ProclamazioneService {
      */
     public ProclamazioneResponseDTO eseguiProclamazione(UUID idHackathon) {
         Hackathon hackathon = hackathonRepository.findById(idHackathon)
-            .orElseThrow(() -> new HackathonNotFoundException(idHackathon));
+                .orElseThrow(() -> new HackathonNotFoundException(idHackathon));
 
         // Guard del pattern State: lancia IllegalStateTransitionException se non IN_VALUTAZIONE
         hackathon.verificaAccettaProclamazione();
 
         Sottomissione vincitrice = sottomissioneRepository.findVincitore(idHackathon)
-            .orElseThrow(() -> new RuntimeException(
-                "Nessuna sottomissione valutata trovata per l'hackathon: " + idHackathon));
+                .orElseThrow(() -> new RuntimeException(
+                        "Nessuna sottomissione valutata trovata per l'hackathon: " + idHackathon));
 
         Team teamVincitore = teamRepository.findById(vincitrice.getIdTeam())
-            .orElseThrow(() -> new TeamNotFoundException(vincitrice.getIdTeam()));
+                .orElseThrow(() -> new TeamNotFoundException(vincitrice.getIdTeam()));
 
         // Segna la sottomissione come vincitrice nel DB
         sottomissioneRepository.markAsVincitore(vincitrice.getId());
@@ -97,12 +97,12 @@ public class ProclamazioneService {
         notificationsService.notificaProclamazione(hackathon, teamVincitore);
 
         return new ProclamazioneResponseDTO(
-            hackathon.getId(),
-            hackathon.getNome(),
-            teamVincitore.getId(),
-            teamVincitore.getNome(),
-            hackathon.getPremio(),
-            hackathon.getStatoEnum()
+                hackathon.getId(),
+                hackathon.getNome(),
+                teamVincitore.getId(),
+                teamVincitore.getNome(),
+                hackathon.getPremio(),
+                hackathon.getStatoEnum()
         );
     }
 }

@@ -50,19 +50,19 @@ public class Hackathon {
                      UUID idOrganizzatore,
                      UUID idGiudice,
                      List<UUID> idMentori) {
-        this.nome                  = nome;
-        this.dataInizio            = dataInizio;
-        this.dataFine              = dataFine;
-        this.scadenzaIscrizioni    = scadenzaIscrizioni;
+        this.nome = nome;
+        this.dataInizio = dataInizio;
+        this.dataFine = dataFine;
+        this.scadenzaIscrizioni = scadenzaIscrizioni;
         this.scadenzaSottomissioni = scadenzaSottomissioni;
-        this.premio                = premio;
-        this.luogo                 = luogo;
-        this.dimensioneMaxTeam     = dimensioneMaxTeam;
-        this.regolamento           = regolamento;
-        this.idOrganizzatore       = idOrganizzatore;
-        this.idGiudice             = idGiudice;
-        this.idMentori             = idMentori;
-        this.stato                 = new StatoInIscrizione();
+        this.premio = premio;
+        this.luogo = luogo;
+        this.dimensioneMaxTeam = dimensioneMaxTeam;
+        this.regolamento = regolamento;
+        this.idOrganizzatore = idOrganizzatore;
+        this.idGiudice = idGiudice;
+        this.idMentori = idMentori;
+        this.stato = new StatoInIscrizione();
     }
 
     /**
@@ -83,8 +83,8 @@ public class Hackathon {
                      List<UUID> idMentori,
                      HackathonState stato) {
         this(nome, dataInizio, dataFine, scadenzaIscrizioni, scadenzaSottomissioni,
-             premio, luogo, dimensioneMaxTeam, regolamento, idOrganizzatore, idGiudice, idMentori);
-        this.id    = id;
+                premio, luogo, dimensioneMaxTeam, regolamento, idOrganizzatore, idGiudice, idMentori);
+        this.id = id;
         this.stato = stato;
     }
 
@@ -112,31 +112,37 @@ public class Hackathon {
     // Transizioni di stato
     // -------------------------------------------------------------------------
 
-    /** IN_ISCRIZIONE → IN_CORSO */
+    /**
+     * IN_ISCRIZIONE → IN_CORSO
+     */
     public void avvia() {
         if (!(stato instanceof StatoInIscrizione)) {
             throw new IllegalStateTransitionException(
-                "Transizione non valida: l'hackathon non è in stato IN_ISCRIZIONE."
+                    "Transizione non valida: l'hackathon non è in stato IN_ISCRIZIONE."
             );
         }
         this.stato = new StatoInCorso();
     }
 
-    /** IN_CORSO → IN_VALUTAZIONE */
+    /**
+     * IN_CORSO → IN_VALUTAZIONE
+     */
     public void chiudiSottomissioni() {
         if (!(stato instanceof StatoInCorso)) {
             throw new IllegalStateTransitionException(
-                "Transizione non valida: l'hackathon non è in stato IN_CORSO."
+                    "Transizione non valida: l'hackathon non è in stato IN_CORSO."
             );
         }
         this.stato = new StatoInValutazione();
     }
 
-    /** IN_VALUTAZIONE → CONCLUSO */
+    /**
+     * IN_VALUTAZIONE → CONCLUSO
+     */
     public void concludi() {
         if (!(stato instanceof StatoInValutazione)) {
             throw new IllegalStateTransitionException(
-                "Transizione non valida: l'hackathon non è in stato IN_VALUTAZIONE."
+                    "Transizione non valida: l'hackathon non è in stato IN_VALUTAZIONE."
             );
         }
         this.stato = new StatoConcluso();
@@ -146,21 +152,67 @@ public class Hackathon {
     // Getter
     // -------------------------------------------------------------------------
 
-    public UUID          getId()                    { return id; }
-    public String        getNome()                  { return nome; }
-    public LocalDateTime getDataInizio()            { return dataInizio; }
-    public LocalDateTime getDataFine()              { return dataFine; }
-    public LocalDateTime getScadenzaIscrizioni()    { return scadenzaIscrizioni; }
-    public LocalDateTime getScadenzaSottomissioni() { return scadenzaSottomissioni; }
-    public double        getPremio()                { return premio; }
-    public Address       getLuogo()                 { return luogo; }
-    public int           getDimensioneMaxTeam()     { return dimensioneMaxTeam; }
-    public String        getRegolamento()           { return regolamento; }
-    public UUID          getIdOrganizzatore()       { return idOrganizzatore; }
-    public UUID          getIdGiudice()             { return idGiudice; }
-    public List<UUID>    getIdMentori()             { return idMentori; }
-    public HackathonState getStato()               { return stato; }
-    public StatoHackathon getStatoEnum()           { return stato.getNome(); }
+    public UUID getId() {
+        return id;
+    }
 
-    public void setId(UUID id) { this.id = id; }
+    public String getNome() {
+        return nome;
+    }
+
+    public LocalDateTime getDataInizio() {
+        return dataInizio;
+    }
+
+    public LocalDateTime getDataFine() {
+        return dataFine;
+    }
+
+    public LocalDateTime getScadenzaIscrizioni() {
+        return scadenzaIscrizioni;
+    }
+
+    public LocalDateTime getScadenzaSottomissioni() {
+        return scadenzaSottomissioni;
+    }
+
+    public double getPremio() {
+        return premio;
+    }
+
+    public Address getLuogo() {
+        return luogo;
+    }
+
+    public int getDimensioneMaxTeam() {
+        return dimensioneMaxTeam;
+    }
+
+    public String getRegolamento() {
+        return regolamento;
+    }
+
+    public UUID getIdOrganizzatore() {
+        return idOrganizzatore;
+    }
+
+    public UUID getIdGiudice() {
+        return idGiudice;
+    }
+
+    public List<UUID> getIdMentori() {
+        return idMentori;
+    }
+
+    public HackathonState getStato() {
+        return stato;
+    }
+
+    public StatoHackathon getStatoEnum() {
+        return stato.getNome();
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 }

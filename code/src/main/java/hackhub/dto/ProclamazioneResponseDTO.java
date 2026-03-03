@@ -10,11 +10,11 @@ import java.util.UUID;
  */
 public class ProclamazioneResponseDTO {
 
-    private final UUID          idHackathon;
-    private final String        nomeHackathon;
-    private final UUID          idTeamVincitore;
-    private final String        nomeTeamVincitore;
-    private final double        premio;
+    private final UUID idHackathon;
+    private final String nomeHackathon;
+    private final UUID idTeamVincitore;
+    private final String nomeTeamVincitore;
+    private final double premio;
     private final StatoHackathon stato;
 
     public ProclamazioneResponseDTO(UUID idHackathon,
@@ -23,18 +23,35 @@ public class ProclamazioneResponseDTO {
                                     String nomeTeamVincitore,
                                     double premio,
                                     StatoHackathon stato) {
-        this.idHackathon       = idHackathon;
-        this.nomeHackathon     = nomeHackathon;
-        this.idTeamVincitore   = idTeamVincitore;
+        this.idHackathon = idHackathon;
+        this.nomeHackathon = nomeHackathon;
+        this.idTeamVincitore = idTeamVincitore;
         this.nomeTeamVincitore = nomeTeamVincitore;
-        this.premio            = premio;
-        this.stato             = stato;
+        this.premio = premio;
+        this.stato = stato;
     }
 
-    public UUID          getIdHackathon()       { return idHackathon; }
-    public String        getNomeHackathon()     { return nomeHackathon; }
-    public UUID          getIdTeamVincitore()   { return idTeamVincitore; }
-    public String        getNomeTeamVincitore() { return nomeTeamVincitore; }
-    public double        getPremio()            { return premio; }
-    public StatoHackathon getStato()            { return stato; }
+    public UUID getIdHackathon() {
+        return idHackathon;
+    }
+
+    public String getNomeHackathon() {
+        return nomeHackathon;
+    }
+
+    public UUID getIdTeamVincitore() {
+        return idTeamVincitore;
+    }
+
+    public String getNomeTeamVincitore() {
+        return nomeTeamVincitore;
+    }
+
+    public double getPremio() {
+        return premio;
+    }
+
+    public StatoHackathon getStato() {
+        return stato;
+    }
 }

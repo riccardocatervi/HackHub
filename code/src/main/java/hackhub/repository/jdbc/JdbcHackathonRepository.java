@@ -23,14 +23,14 @@ public class JdbcHackathonRepository implements HackathonRepository {
     @Override
     public void save(Hackathon hackathon) {
         String sqlHackathon = """
-            INSERT INTO hackathon (
-                nome, data_inizio, data_fine, scadenza_iscrizioni, scadenza_sottomissioni,
-                premio, dimensione_max_team, regolamento, stato,
-                id_organizzatore, id_giudice,
-                via, numero_civico, citta, cap, provincia
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            RETURNING id
-            """;
+                INSERT INTO hackathon (
+                    nome, data_inizio, data_fine, scadenza_iscrizioni, scadenza_sottomissioni,
+                    premio, dimensione_max_team, regolamento, stato,
+                    id_organizzatore, id_giudice,
+                    via, numero_civico, citta, cap, provincia
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                RETURNING id
+                """;
 
         // Operazione su due tabelle: usa transazione esplicita.
         try (Connection conn = dbConnection.getConnection()) {
@@ -52,24 +52,24 @@ public class JdbcHackathonRepository implements HackathonRepository {
     private UUID inserisciHackathon(Connection conn, String sql, Hackathon h) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             Address luogo = h.getLuogo();
-            stmt.setString(1,  h.getNome());
-            stmt.setTimestamp(2,  Timestamp.valueOf(h.getDataInizio()));
-            stmt.setTimestamp(3,  Timestamp.valueOf(h.getDataFine()));
-            stmt.setTimestamp(4,  Timestamp.valueOf(h.getScadenzaIscrizioni()));
-            stmt.setTimestamp(5,  Timestamp.valueOf(h.getScadenzaSottomissioni()));
-            stmt.setDouble(6,    h.getPremio());
-            stmt.setInt(7,       h.getDimensioneMaxTeam());
-            stmt.setString(8,    h.getRegolamento());
-            stmt.setString(9,    h.getStatoEnum().name());
-            stmt.setObject(10,   h.getIdOrganizzatore());
-            stmt.setObject(11,   h.getIdGiudice());
+            stmt.setString(1, h.getNome());
+            stmt.setTimestamp(2, Timestamp.valueOf(h.getDataInizio()));
+            stmt.setTimestamp(3, Timestamp.valueOf(h.getDataFine()));
+            stmt.setTimestamp(4, Timestamp.valueOf(h.getScadenzaIscrizioni()));
+            stmt.setTimestamp(5, Timestamp.valueOf(h.getScadenzaSottomissioni()));
+            stmt.setDouble(6, h.getPremio());
+            stmt.setInt(7, h.getDimensioneMaxTeam());
+            stmt.setString(8, h.getRegolamento());
+            stmt.setString(9, h.getStatoEnum().name());
+            stmt.setObject(10, h.getIdOrganizzatore());
+            stmt.setObject(11, h.getIdGiudice());
 
             if (luogo != null) {
-                stmt.setString(12,  luogo.getVia());
-                stmt.setInt(13,     luogo.getNumeroCivico());
-                stmt.setString(14,  luogo.getCitta());
-                stmt.setString(15,  luogo.getCap());
-                stmt.setString(16,  luogo.getProvincia());
+                stmt.setString(12, luogo.getVia());
+                stmt.setInt(13, luogo.getNumeroCivico());
+                stmt.setString(14, luogo.getCitta());
+                stmt.setString(15, luogo.getCap());
+                stmt.setString(16, luogo.getProvincia());
             } else {
                 stmt.setNull(12, Types.VARCHAR);
                 stmt.setNull(13, Types.INTEGER);
@@ -104,13 +104,13 @@ public class JdbcHackathonRepository implements HackathonRepository {
     @Override
     public Optional<Hackathon> findById(UUID id) {
         String sql = """
-            SELECT h.*,
-                   array_remove(array_agg(hm.id_mentore), NULL) AS mentori
-            FROM hackathon h
-            LEFT JOIN hackathon_mentori hm ON hm.id_hackathon = h.id
-            WHERE h.id = ?
-            GROUP BY h.id
-            """;
+                SELECT h.*,
+                       array_remove(array_agg(hm.id_mentore), NULL) AS mentori
+                FROM hackathon h
+                LEFT JOIN hackathon_mentori hm ON hm.id_hackathon = h.id
+                WHERE h.id = ?
+                GROUP BY h.id
+                """;
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -145,17 +145,17 @@ public class JdbcHackathonRepository implements HackathonRepository {
     }
 
     private Hackathon mapRow(ResultSet rs) throws SQLException {
-        UUID id   = (UUID) rs.getObject("id");
+        UUID id = (UUID) rs.getObject("id");
         String via = rs.getString("via");
 
         Address luogo = null;
         if (via != null) {
             luogo = new Address(
-                via,
-                rs.getInt("numero_civico"),
-                rs.getString("citta"),
-                rs.getString("cap"),
-                rs.getString("provincia")
+                    via,
+                    rs.getInt("numero_civico"),
+                    rs.getString("citta"),
+                    rs.getString("cap"),
+                    rs.getString("provincia")
             );
         }
 
@@ -171,20 +171,20 @@ public class JdbcHackathonRepository implements HackathonRepository {
         StatoHackathon stato = StatoHackathon.valueOf(rs.getString("stato"));
 
         return new Hackathon(
-            id,
-            rs.getString("nome"),
-            rs.getTimestamp("data_inizio").toLocalDateTime(),
-            rs.getTimestamp("data_fine").toLocalDateTime(),
-            rs.getTimestamp("scadenza_iscrizioni").toLocalDateTime(),
-            rs.getTimestamp("scadenza_sottomissioni").toLocalDateTime(),
-            rs.getDouble("premio"),
-            luogo,
-            rs.getInt("dimensione_max_team"),
-            rs.getString("regolamento"),
-            (UUID) rs.getObject("id_organizzatore"),
-            (UUID) rs.getObject("id_giudice"),
-            idMentori,
-            stato.creaIstanza()
+                id,
+                rs.getString("nome"),
+                rs.getTimestamp("data_inizio").toLocalDateTime(),
+                rs.getTimestamp("data_fine").toLocalDateTime(),
+                rs.getTimestamp("scadenza_iscrizioni").toLocalDateTime(),
+                rs.getTimestamp("scadenza_sottomissioni").toLocalDateTime(),
+                rs.getDouble("premio"),
+                luogo,
+                rs.getInt("dimensione_max_team"),
+                rs.getString("regolamento"),
+                (UUID) rs.getObject("id_organizzatore"),
+                (UUID) rs.getObject("id_giudice"),
+                idMentori,
+                stato.creaIstanza()
         );
     }
 }

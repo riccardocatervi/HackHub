@@ -11,7 +11,7 @@ public class StatoInValutazione implements HackathonState {
     @Override
     public void accettaSottomissione() {
         throw new IllegalStateTransitionException(
-            "Impossibile inviare una sottomissione: la scadenza per le sottomissioni è scaduta."
+                "Impossibile inviare una sottomissione: la scadenza per le sottomissioni è scaduta."
         );
     }
 

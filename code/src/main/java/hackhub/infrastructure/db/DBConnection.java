@@ -15,7 +15,7 @@ public class DBConnection {
     private final String password;
 
     public DBConnection(String url, String username, String password) {
-        this.url      = url;
+        this.url = url;
         this.username = username;
         this.password = password;
     }

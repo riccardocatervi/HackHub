@@ -59,10 +59,10 @@ public class JdbcGiudiceRepository implements GiudiceRepository {
 
     private Giudice mapRow(ResultSet rs) throws SQLException {
         return new Giudice(
-            (UUID) rs.getObject("id"),
-            rs.getString("nome"),
-            rs.getString("cognome"),
-            rs.getBoolean("disponibile")
+                (UUID) rs.getObject("id"),
+                rs.getString("nome"),
+                rs.getString("cognome"),
+                rs.getBoolean("disponibile")
         );
     }
 }

@@ -17,10 +17,10 @@ public enum StatoHackathon {
      */
     public HackathonState creaIstanza() {
         return switch (this) {
-            case IN_ISCRIZIONE  -> new StatoInIscrizione();
-            case IN_CORSO       -> new StatoInCorso();
+            case IN_ISCRIZIONE -> new StatoInIscrizione();
+            case IN_CORSO -> new StatoInCorso();
             case IN_VALUTAZIONE -> new StatoInValutazione();
-            case CONCLUSO       -> new StatoConcluso();
+            case CONCLUSO -> new StatoConcluso();
         };
     }
 }

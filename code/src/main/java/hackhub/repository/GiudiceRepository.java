@@ -7,6 +7,8 @@ import java.util.UUID;
 
 public interface GiudiceRepository extends GenericRepository<Giudice, UUID> {
 
-    /** Restituisce tutti i giudici con disponibilità = true. */
+    /**
+     * Restituisce tutti i giudici con disponibilità = true.
+     */
     List<Giudice> findAllDisponibili();
 }

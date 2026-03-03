@@ -6,16 +6,16 @@ import java.util.Properties;
 
 /**
  * Carica la configurazione del database da un file di proprietà nel classpath.
- *
+ * <p>
  * Ordine di precedenza (12-factor app):
- *   1. Variabili d'ambiente DB_URL / DB_USER / DB_PASS  (produzione, CI/CD)
- *   2. Proprietà nel file application.properties         (sviluppo locale)
- *
+ * 1. Variabili d'ambiente DB_URL / DB_USER / DB_PASS  (produzione, CI/CD)
+ * 2. Proprietà nel file application.properties         (sviluppo locale)
+ * <p>
  * In questo modo nessuna credenziale viene hardcodata nel codice sorgente.
  */
 public class DBConfig {
 
-    private static final String ENV_URL  = "DB_URL";
+    private static final String ENV_URL = "DB_URL";
     private static final String ENV_USER = "DB_USER";
     private static final String ENV_PASS = "DB_PASS";
 
@@ -24,7 +24,7 @@ public class DBConfig {
     private final String password;
 
     private DBConfig(String url, String username, String password) {
-        this.url      = url;
+        this.url = url;
         this.username = username;
         this.password = password;
     }
@@ -38,9 +38,9 @@ public class DBConfig {
      */
     public static DBConfig fromClasspath(String filename) {
         Properties props = caricaProperties(filename);
-        String url  = conOverrideEnv(ENV_URL,  richiedi(props, "db.url",      filename));
-        String user = conOverrideEnv(ENV_USER, richiedi(props, "db.username",  filename));
-        String pass = conOverrideEnv(ENV_PASS, richiedi(props, "db.password",  filename));
+        String url = conOverrideEnv(ENV_URL, richiedi(props, "db.url", filename));
+        String user = conOverrideEnv(ENV_USER, richiedi(props, "db.username", filename));
+        String pass = conOverrideEnv(ENV_PASS, richiedi(props, "db.password", filename));
         return new DBConfig(url, user, pass);
     }
 
@@ -49,15 +49,15 @@ public class DBConfig {
         try (InputStream is = DBConfig.class.getClassLoader().getResourceAsStream(filename)) {
             if (is == null) {
                 throw new RuntimeException(
-                    "File di configurazione '" + filename + "' non trovato nel classpath. " +
-                    "Copia 'application.properties.example' in 'application.properties' " +
-                    "e configura i valori corretti."
+                        "File di configurazione '" + filename + "' non trovato nel classpath. " +
+                                "Copia 'application.properties.example' in 'application.properties' " +
+                                "e configura i valori corretti."
                 );
             }
             props.load(is);
         } catch (IOException e) {
             throw new RuntimeException(
-                "Errore nel caricamento di '" + filename + "': " + e.getMessage(), e
+                    "Errore nel caricamento di '" + filename + "': " + e.getMessage(), e
             );
         }
         return props;
@@ -67,7 +67,7 @@ public class DBConfig {
         String valore = props.getProperty(chiave);
         if (valore == null || valore.isBlank()) {
             throw new RuntimeException(
-                "Proprietà obbligatoria '" + chiave + "' mancante in '" + filename + "'."
+                    "Proprietà obbligatoria '" + chiave + "' mancante in '" + filename + "'."
             );
         }
         return valore.trim();
@@ -82,7 +82,15 @@ public class DBConfig {
         return (envValue != null && !envValue.isBlank()) ? envValue.trim() : fallback;
     }
 
-    public String getUrl()      { return url; }
-    public String getUsername() { return username; }
-    public String getPassword() { return password; }
+    public String getUrl() {
+        return url;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 }

@@ -11,14 +11,14 @@ public class StatoInIscrizione implements HackathonState {
     @Override
     public void accettaSottomissione() {
         throw new IllegalStateTransitionException(
-            "Impossibile inviare una sottomissione: l'hackathon è ancora in fase di iscrizione."
+                "Impossibile inviare una sottomissione: l'hackathon è ancora in fase di iscrizione."
         );
     }
 
     @Override
     public void accettaProclamazione() {
         throw new IllegalStateTransitionException(
-            "Impossibile proclamare il vincitore: l'hackathon è ancora in fase di iscrizione."
+                "Impossibile proclamare il vincitore: l'hackathon è ancora in fase di iscrizione."
         );
     }
 

@@ -41,22 +41,25 @@ import static org.mockito.Mockito.*;
 @DisplayName("SottomissioneService — Inviare Sottomissione del Team")
 class SottomissioneServiceTest {
 
-    @Mock private HackathonRepository     hackathonRepository;
-    @Mock private SottomissioneRepository sottomissioneRepository;
-    @Mock private TeamRepository          teamRepository;
+    @Mock
+    private HackathonRepository hackathonRepository;
+    @Mock
+    private SottomissioneRepository sottomissioneRepository;
+    @Mock
+    private TeamRepository teamRepository;
 
     private SottomissioneService sottomissioneService;
 
-    private static final LocalDateTime BASE        = LocalDateTime.now();
-    private static final UUID          ID_HACKATHON = UUID.randomUUID();
-    private static final UUID          ID_TEAM      = UUID.randomUUID();
+    private static final LocalDateTime BASE = LocalDateTime.now();
+    private static final UUID ID_HACKATHON = UUID.randomUUID();
+    private static final UUID ID_TEAM = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
         sottomissioneService = new SottomissioneService(
-            hackathonRepository,
-            sottomissioneRepository,
-            teamRepository
+                hackathonRepository,
+                sottomissioneRepository,
+                teamRepository
         );
     }
 
@@ -73,9 +76,9 @@ class SottomissioneServiceTest {
         void hackathonInCorso_nessunDuplicato_salvaERestituisce() {
             // Given
             when(hackathonRepository.findById(ID_HACKATHON))
-                .thenReturn(Optional.of(hackathonConStato(new StatoInCorso())));
+                    .thenReturn(Optional.of(hackathonConStato(new StatoInCorso())));
             when(sottomissioneRepository.existsByHackathonAndTeam(ID_HACKATHON, ID_TEAM))
-                .thenReturn(false);
+                    .thenReturn(false);
             doAnswer(invocation -> {
                 Sottomissione s = invocation.getArgument(0);
                 s.setId(UUID.randomUUID());
@@ -84,7 +87,7 @@ class SottomissioneServiceTest {
 
             // When
             SottomissioneResponseDTO response =
-                sottomissioneService.inviaSottomissione(buildDto());
+                    sottomissioneService.inviaSottomissione(buildDto());
 
             // Then
             assertNotNull(response);
@@ -99,7 +102,7 @@ class SottomissioneServiceTest {
             when(hackathonRepository.findById(ID_HACKATHON)).thenReturn(Optional.empty());
 
             assertThrows(HackathonNotFoundException.class,
-                () -> sottomissioneService.inviaSottomissione(buildDto()));
+                    () -> sottomissioneService.inviaSottomissione(buildDto()));
             verify(sottomissioneRepository, never()).save(any());
         }
 
@@ -107,10 +110,10 @@ class SottomissioneServiceTest {
         @DisplayName("Hackathon in stato IN_ISCRIZIONE → lancia IllegalStateTransitionException")
         void hackathonInIscrizione_lancia() {
             when(hackathonRepository.findById(ID_HACKATHON))
-                .thenReturn(Optional.of(hackathonConStato(new StatoInIscrizione())));
+                    .thenReturn(Optional.of(hackathonConStato(new StatoInIscrizione())));
 
             assertThrows(IllegalStateTransitionException.class,
-                () -> sottomissioneService.inviaSottomissione(buildDto()));
+                    () -> sottomissioneService.inviaSottomissione(buildDto()));
             verify(sottomissioneRepository, never()).save(any());
         }
 
@@ -118,10 +121,10 @@ class SottomissioneServiceTest {
         @DisplayName("Hackathon in stato IN_VALUTAZIONE → lancia IllegalStateTransitionException")
         void hackathonInValutazione_lancia() {
             when(hackathonRepository.findById(ID_HACKATHON))
-                .thenReturn(Optional.of(hackathonConStato(new StatoInValutazione())));
+                    .thenReturn(Optional.of(hackathonConStato(new StatoInValutazione())));
 
             assertThrows(IllegalStateTransitionException.class,
-                () -> sottomissioneService.inviaSottomissione(buildDto()));
+                    () -> sottomissioneService.inviaSottomissione(buildDto()));
             verify(sottomissioneRepository, never()).save(any());
         }
 
@@ -129,12 +132,12 @@ class SottomissioneServiceTest {
         @DisplayName("Team ha già inviato una sottomissione → lancia SottomissioneAlreadyExistsException")
         void sottomissioneDuplicata_lancia() {
             when(hackathonRepository.findById(ID_HACKATHON))
-                .thenReturn(Optional.of(hackathonConStato(new StatoInCorso())));
+                    .thenReturn(Optional.of(hackathonConStato(new StatoInCorso())));
             when(sottomissioneRepository.existsByHackathonAndTeam(ID_HACKATHON, ID_TEAM))
-                .thenReturn(true);
+                    .thenReturn(true);
 
             assertThrows(SottomissioneAlreadyExistsException.class,
-                () -> sottomissioneService.inviaSottomissione(buildDto()));
+                    () -> sottomissioneService.inviaSottomissione(buildDto()));
             verify(sottomissioneRepository, never()).save(any());
         }
     }
@@ -151,12 +154,12 @@ class SottomissioneServiceTest {
         @DisplayName("Hackathon IN_CORSO, team trovato → restituisce form")
         void hackathonInCorso_teamTrovato_restituisceForm() {
             when(hackathonRepository.findById(ID_HACKATHON))
-                .thenReturn(Optional.of(hackathonConStato(new StatoInCorso())));
+                    .thenReturn(Optional.of(hackathonConStato(new StatoInCorso())));
             when(teamRepository.findById(ID_TEAM))
-                .thenReturn(Optional.of(new Team(ID_TEAM, "Team Alfa", "Desc", UUID.randomUUID(), ID_HACKATHON)));
+                    .thenReturn(Optional.of(new Team(ID_TEAM, "Team Alfa", "Desc", UUID.randomUUID(), ID_HACKATHON)));
 
             SottomissioneFormDTO form =
-                sottomissioneService.getFormData(ID_HACKATHON, ID_TEAM);
+                    sottomissioneService.getFormData(ID_HACKATHON, ID_TEAM);
 
             assertNotNull(form);
             assertEquals(ID_HACKATHON, form.getIdHackathon());
@@ -168,10 +171,10 @@ class SottomissioneServiceTest {
         @DisplayName("Hackathon IN_ISCRIZIONE → lancia IllegalStateTransitionException prima del team lookup")
         void hackathonInIscrizione_lanciaImmediatamente() {
             when(hackathonRepository.findById(ID_HACKATHON))
-                .thenReturn(Optional.of(hackathonConStato(new StatoInIscrizione())));
+                    .thenReturn(Optional.of(hackathonConStato(new StatoInIscrizione())));
 
             assertThrows(IllegalStateTransitionException.class,
-                () -> sottomissioneService.getFormData(ID_HACKATHON, ID_TEAM));
+                    () -> sottomissioneService.getFormData(ID_HACKATHON, ID_TEAM));
             verify(teamRepository, never()).findById(any());
         }
 
@@ -179,11 +182,11 @@ class SottomissioneServiceTest {
         @DisplayName("Team non trovato → lancia TeamNotFoundException")
         void teamNonTrovato_lancia() {
             when(hackathonRepository.findById(ID_HACKATHON))
-                .thenReturn(Optional.of(hackathonConStato(new StatoInCorso())));
+                    .thenReturn(Optional.of(hackathonConStato(new StatoInCorso())));
             when(teamRepository.findById(ID_TEAM)).thenReturn(Optional.empty());
 
             assertThrows(TeamNotFoundException.class,
-                () -> sottomissioneService.getFormData(ID_HACKATHON, ID_TEAM));
+                    () -> sottomissioneService.getFormData(ID_HACKATHON, ID_TEAM));
         }
     }
 
@@ -203,12 +206,12 @@ class SottomissioneServiceTest {
 
     private Hackathon hackathonConStato(HackathonState stato) {
         return new Hackathon(
-            ID_HACKATHON, "Hackathon Test",
-            BASE.plusDays(10), BASE.plusDays(20),
-            BASE.plusDays(5),  BASE.plusDays(15),
-            1000.0, null, 5, "Regolamento",
-            UUID.randomUUID(), UUID.randomUUID(), List.of(),
-            stato
+                ID_HACKATHON, "Hackathon Test",
+                BASE.plusDays(10), BASE.plusDays(20),
+                BASE.plusDays(5), BASE.plusDays(15),
+                1000.0, null, 5, "Regolamento",
+                UUID.randomUUID(), UUID.randomUUID(), List.of(),
+                stato
         );
     }
 }

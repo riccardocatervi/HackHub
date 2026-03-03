@@ -33,18 +33,18 @@ public class JdbcSottomissioneRepository implements SottomissioneRepository {
 
         } catch (SQLException e) {
             throw new RuntimeException(
-                "Errore durante il recupero della sottomissione con id " + id + ": " + e.getMessage(), e);
+                    "Errore durante il recupero della sottomissione con id " + id + ": " + e.getMessage(), e);
         }
     }
 
     @Override
     public void save(Sottomissione s) {
         String sql = """
-            INSERT INTO sottomissione
-                (link_repo, link_demo, descrizione, data_invio, id_team, id_hackathon, vincitore)
-            VALUES (?, ?, ?, ?, ?, ?, false)
-            RETURNING id
-            """;
+                INSERT INTO sottomissione
+                    (link_repo, link_demo, descrizione, data_invio, id_team, id_hackathon, vincitore)
+                VALUES (?, ?, ?, ?, ?, ?, false)
+                RETURNING id
+                """;
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -86,11 +86,11 @@ public class JdbcSottomissioneRepository implements SottomissioneRepository {
     @Override
     public long countNonValutate(UUID idHackathon) {
         String sql = """
-            SELECT COUNT(*)
-            FROM sottomissione s
-            LEFT JOIN valutazione v ON v.id_sottomissione = s.id
-            WHERE s.id_hackathon = ? AND v.id IS NULL
-            """;
+                SELECT COUNT(*)
+                FROM sottomissione s
+                LEFT JOIN valutazione v ON v.id_sottomissione = s.id
+                WHERE s.id_hackathon = ? AND v.id IS NULL
+                """;
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -108,13 +108,13 @@ public class JdbcSottomissioneRepository implements SottomissioneRepository {
     public Optional<Sottomissione> findVincitore(UUID idHackathon) {
         // Restituisce la sottomissione con il voto più alto per l'hackathon dato.
         String sql = """
-            SELECT s.*
-            FROM sottomissione s
-            JOIN valutazione v ON v.id_sottomissione = s.id
-            WHERE s.id_hackathon = ?
-            ORDER BY v.voto DESC
-            LIMIT 1
-            """;
+                SELECT s.*
+                FROM sottomissione s
+                JOIN valutazione v ON v.id_sottomissione = s.id
+                WHERE s.id_hackathon = ?
+                ORDER BY v.voto DESC
+                LIMIT 1
+                """;
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -149,14 +149,14 @@ public class JdbcSottomissioneRepository implements SottomissioneRepository {
 
     private Sottomissione mapRow(ResultSet rs) throws SQLException {
         return new Sottomissione(
-            (UUID) rs.getObject("id"),
-            rs.getString("link_repo"),
-            rs.getString("link_demo"),
-            rs.getString("descrizione"),
-            rs.getTimestamp("data_invio").toLocalDateTime(),
-            (UUID) rs.getObject("id_team"),
-            (UUID) rs.getObject("id_hackathon"),
-            rs.getBoolean("vincitore")
+                (UUID) rs.getObject("id"),
+                rs.getString("link_repo"),
+                rs.getString("link_demo"),
+                rs.getString("descrizione"),
+                rs.getTimestamp("data_invio").toLocalDateTime(),
+                (UUID) rs.getObject("id_team"),
+                (UUID) rs.getObject("id_hackathon"),
+                rs.getBoolean("vincitore")
         );
     }
 }
