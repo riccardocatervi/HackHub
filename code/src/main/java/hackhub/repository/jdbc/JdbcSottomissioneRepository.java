@@ -181,6 +181,28 @@ public class JdbcSottomissioneRepository implements SottomissioneRepository {
         }
     }
 
+    @Override
+    public List<Sottomissione> findAllByHackathon(UUID idHackathon) {
+        String sql = "SELECT * FROM sottomissione WHERE id_hackathon = ? ORDER BY data_invio ASC";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idHackathon);
+            ResultSet rs = stmt.executeQuery();
+
+            List<Sottomissione> risultato = new ArrayList<>();
+            while (rs.next()) {
+                risultato.add(mapRow(rs));
+            }
+            return risultato;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Errore durante il recupero di tutte le sottomissioni per hackathon " + idHackathon + ": " + e.getMessage(), e);
+        }
+    }
+
     private Sottomissione mapRow(ResultSet rs) throws SQLException {
         return new Sottomissione(
                 (UUID) rs.getObject("id"),

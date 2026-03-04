@@ -19,6 +19,12 @@ public interface TeamRepository extends GenericRepository<Team, UUID> {
     Optional<Team> findByHackathonAndMembro(UUID idHackathon, UUID idUtente);
 
     /**
+     * Restituisce tutti i team registrati per un determinato hackathon.
+     * Usato per popolare il modulo di segnalazione del mentore.
+     */
+    List<Team> findByHackathon(UUID idHackathon);
+
+    /**
      * Aggiunge un utente come membro effettivo del team (a seguito di accettazione invito).
      */
     void addMembro(UUID idTeam, UUID idUtente);

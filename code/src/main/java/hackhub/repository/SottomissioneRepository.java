@@ -34,4 +34,10 @@ public interface SottomissioneRepository extends GenericRepository<Sottomissione
 
     /** Restituisce le sottomissioni ancora da valutare per un hackathon. */
     List<Sottomissione> findSottomissioniDaValutare(UUID idHackathon, UUID idGiudice);
+
+    /**
+     * Restituisce tutte le sottomissioni (valutate e non) per un hackathon.
+     * Usato per la dashboard del giudice che mostra lo stato completo.
+     */
+    List<Sottomissione> findAllByHackathon(UUID idHackathon);
 }

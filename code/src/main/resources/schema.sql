@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS sottomissione (
 
 CREATE TABLE IF NOT EXISTS valutazione (
     id               UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
-    voto             DECIMAL(5,2)  NOT NULL CHECK (voto >= 0 AND voto <= 100),
+    voto             DECIMAL(4,2)  NOT NULL CHECK (voto >= 0 AND voto <= 10),
     giudizio_scritto TEXT,
     id_sottomissione UUID          NOT NULL UNIQUE REFERENCES sottomissione(id) ON DELETE CASCADE,
     id_giudice       UUID          NOT NULL REFERENCES giudice(id)
@@ -166,11 +166,13 @@ CREATE TABLE IF NOT EXISTS valutazione (
 -- =============================================================================
 
 CREATE TABLE IF NOT EXISTS segnalazione (
-    id          UUID      PRIMARY KEY DEFAULT gen_random_uuid(),
-    id_team     UUID      NOT NULL REFERENCES team(id),
-    id_mentore  UUID      NOT NULL REFERENCES mentore(id),
-    descrizione TEXT      NOT NULL,
-    data_invio  TIMESTAMP NOT NULL DEFAULT NOW()
+    id           UUID      PRIMARY KEY DEFAULT gen_random_uuid(),
+    id_team      UUID      NOT NULL REFERENCES team(id),
+    id_mentore   UUID      NOT NULL REFERENCES mentore(id),
+    id_hackathon UUID      NOT NULL REFERENCES hackathon(id),
+    descrizione  TEXT      NOT NULL,
+    prove        TEXT,
+    data_invio   TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 -- =============================================================================

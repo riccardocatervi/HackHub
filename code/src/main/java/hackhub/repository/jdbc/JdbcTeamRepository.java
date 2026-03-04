@@ -92,6 +92,28 @@ public class JdbcTeamRepository implements TeamRepository {
     }
 
     @Override
+    public List<Team> findByHackathon(UUID idHackathon) {
+        String sql = "SELECT * FROM team WHERE id_hackathon = ? ORDER BY nome ASC";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idHackathon);
+            ResultSet rs = stmt.executeQuery();
+
+            List<Team> risultato = new ArrayList<>();
+            while (rs.next()) {
+                risultato.add(mapRow(rs));
+            }
+            return risultato;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Errore durante il recupero dei team per hackathon " + idHackathon + ": " + e.getMessage(), e);
+        }
+    }
+
+    @Override
     public void addMembro(UUID idTeam, UUID idUtente) {
         String sql = "INSERT INTO membro_team (id_utente, id_team) VALUES (?, ?) ON CONFLICT DO NOTHING";
 

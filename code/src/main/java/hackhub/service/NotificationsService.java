@@ -2,7 +2,11 @@ package hackhub.service;
 
 import hackhub.model.entity.Hackathon;
 import hackhub.model.entity.Invito;
+import hackhub.model.entity.Segnalazione;
 import hackhub.model.entity.Team;
+import hackhub.model.entity.Valutazione;
+import hackhub.service.observer.SegnalazioneObserver;
+import hackhub.service.observer.ValutazioneObserver;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,10 +14,14 @@ import java.util.logging.Logger;
 
 /**
  * Servizio responsabile dell'invio delle notifiche ai partecipanti.
- * Attualmente implementa le notifiche tramite log di sistema.
+ * <p>
+ * Implementa i pattern Observer {@link SegnalazioneObserver} e {@link ValutazioneObserver}
+ * per essere notificato quando vengono registrate segnalazioni o valutazioni.
+ * <p>
+ * Attualmente le notifiche sono implementate tramite log di sistema.
  * Progettato per essere esteso con email/push nelle iterazioni successive.
  */
-public class NotificationsService {
+public class NotificationsService implements SegnalazioneObserver, ValutazioneObserver {
 
     private static final Logger LOG = Logger.getLogger(NotificationsService.class.getName());
 
@@ -49,8 +57,6 @@ public class NotificationsService {
 
     /**
      * Notifica gli utenti invitati a unirsi a un team.
-     * Per ogni invito viene emesso un log; in produzione andrà sostituito
-     * con l'invio di email o push notification.
      */
     public void inviaInvitiTeam(Team team, List<Invito> inviti) {
         if (inviti == null || inviti.isEmpty()) {
@@ -74,12 +80,40 @@ public class NotificationsService {
         }
     }
 
+    // -------------------------------------------------------------------------
+    // Implementazione Observer — pattern GoF
+    // -------------------------------------------------------------------------
+
     /**
-     * Notifica l'organizzatore della ricezione di una nuova segnalazione di violazione.
+     * Riceve l'evento di nuova segnalazione e notifica l'organizzatore.
+     * Implementazione di {@link SegnalazioneObserver}.
      */
-    public void notificaOrganizzatore(UUID organizzatoreId, UUID segnalazioneId) {
+    @Override
+    public void onNuovaSegnalazione(Segnalazione segnalazione, UUID organizzatoreId) {
         LOG.info(String.format(
-                "Nuova segnalazione (id: %s) inoltrata all'organizzatore (id: %s) per revisione.",
-                segnalazioneId, organizzatoreId));
+                "Nuova segnalazione (id: %s) per team %s nell'hackathon %s " +
+                "inoltrata all'organizzatore (id: %s) per revisione immediata.",
+                segnalazione.getId(),
+                segnalazione.getTeamId(),
+                segnalazione.getHackathonId(),
+                organizzatoreId
+        ));
+    }
+
+    /**
+     * Riceve l'evento di valutazione completata e registra il log.
+     * Implementazione di {@link ValutazioneObserver}.
+     */
+    @Override
+    public void onValutazioneCompletata(Valutazione valutazione, UUID idHackathon) {
+        LOG.info(String.format(
+                "Valutazione completata (id: %s) per sottomissione %s nell'hackathon %s — " +
+                "punteggio: %.2f, giudice: %s.",
+                valutazione.getId(),
+                valutazione.getIdSottomissione(),
+                idHackathon,
+                valutazione.getPunteggio(),
+                valutazione.getIdGiudice()
+        ));
     }
 }
