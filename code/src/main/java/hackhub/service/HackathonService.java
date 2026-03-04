@@ -61,6 +61,7 @@ public class HackathonService {
 
         String nomeOrganizzatore = organizzatore.getNome() + " " + organizzatore.getCognome();
         return new HackathonFormDataDTO(nomeOrganizzatore, giudici, mentori);
+
     }
 
     /**

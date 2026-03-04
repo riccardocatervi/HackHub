@@ -119,7 +119,7 @@ class HackathonServiceTest {
         void giudiceNonDisponibile_lancia() {
             HackathonSubmissionDTO dto = buildDtoValido();
             when(giudiceRepository.findById(ID_GIUDICE))
-                    .thenReturn(Optional.of(new Giudice(ID_GIUDICE, "Mario", "Rossi", false)));
+                    .thenReturn(Optional.of(new Giudice(ID_GIUDICE, "Mario", "Rossi", "mario.rossi@hackhub.it", false)));
 
             assertThrows(IllegalArgumentException.class,
                     () -> hackathonService.creaHackathon(dto));
@@ -144,7 +144,7 @@ class HackathonServiceTest {
             HackathonSubmissionDTO dto = buildDtoValido();
             stubGiudiceDisponibile();
             when(mentoreRepository.findById(ID_MENTORE))
-                    .thenReturn(Optional.of(new Mentore(ID_MENTORE, "Anna", "Bianchi", false)));
+                    .thenReturn(Optional.of(new Mentore(ID_MENTORE, "Anna", "Bianchi", "anna.bianchi@hackhub.it", false)));
 
             assertThrows(IllegalArgumentException.class,
                     () -> hackathonService.creaHackathon(dto));
@@ -217,9 +217,9 @@ class HackathonServiceTest {
             when(organizzatoreRepository.findById(ID_ORG))
                     .thenReturn(Optional.of(new Organizzatore(ID_ORG, "Luca", "Verdi", "luca@test.it")));
             when(giudiceRepository.findAllDisponibili())
-                    .thenReturn(List.of(new Giudice(ID_GIUDICE, "Sara", "Neri", true)));
+                    .thenReturn(List.of(new Giudice(ID_GIUDICE, "Sara", "Neri", "sara.neri@hackhub.it", true)));
             when(mentoreRepository.findAllDisponibili())
-                    .thenReturn(List.of(new Mentore(ID_MENTORE, "Marco", "Blu", true)));
+                    .thenReturn(List.of(new Mentore(ID_MENTORE, "Marco", "Blu", "marco.blu@hackhub.it", true)));
 
             // When
             HackathonFormDataDTO form = hackathonService.getFormData(ID_ORG);
@@ -265,11 +265,11 @@ class HackathonServiceTest {
 
     private void stubGiudiceDisponibile() {
         when(giudiceRepository.findById(ID_GIUDICE))
-                .thenReturn(Optional.of(new Giudice(ID_GIUDICE, "Mario", "Rossi", true)));
+                .thenReturn(Optional.of(new Giudice(ID_GIUDICE, "Mario", "Rossi", "mario.rossi@hackhub.it", true)));
     }
 
     private void stubMentoreDisponibile() {
         when(mentoreRepository.findById(ID_MENTORE))
-                .thenReturn(Optional.of(new Mentore(ID_MENTORE, "Anna", "Bianchi", true)));
+                .thenReturn(Optional.of(new Mentore(ID_MENTORE, "Anna", "Bianchi", "anna.bianchi@hackhub.it", true)));
     }
 }

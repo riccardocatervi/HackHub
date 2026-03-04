@@ -217,7 +217,8 @@ class ProclamazioneServiceTest {
                 LocalDateTime.now().minusHours(2),
                 ID_TEAM,
                 ID_HACKATHON,
-                false
+                false,
+                true
         );
     }
 

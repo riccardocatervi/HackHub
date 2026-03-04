@@ -1,20 +1,10 @@
 package hackhub;
 
-import hackhub.controller.HackathonController;
-import hackhub.controller.ProclamazioneController;
-import hackhub.controller.SottomissioneController;
+import hackhub.controller.*;
 import hackhub.infrastructure.db.DBConfig;
 import hackhub.infrastructure.db.DBConnection;
-import hackhub.repository.jdbc.JdbcGiudiceRepository;
-import hackhub.repository.jdbc.JdbcHackathonRepository;
-import hackhub.repository.jdbc.JdbcMentoreRepository;
-import hackhub.repository.jdbc.JdbcOrganizzatoreRepository;
-import hackhub.repository.jdbc.JdbcSottomissioneRepository;
-import hackhub.repository.jdbc.JdbcTeamRepository;
-import hackhub.service.HackathonService;
-import hackhub.service.NotificationsService;
-import hackhub.service.ProclamazioneService;
-import hackhub.service.SottomissioneService;
+import hackhub.repository.jdbc.*;
+import hackhub.service.*;
 
 /**
  * Punto di ingresso dell'applicazione HackHub (Java SE puro).
@@ -33,20 +23,25 @@ public class HackHubApplication {
     public static void main(String[] args) {
 
         // --- Caricamento configurazione DB (nessuna credenziale hardcodata) ---
-        DBConfig dbConfig = DBConfig.fromClasspath(CONFIG_FILE);
-        DBConnection db = new DBConnection(dbConfig.getUrl(), dbConfig.getUsername(), dbConfig.getPassword());
+        DBConfig    dbConfig = DBConfig.fromClasspath(CONFIG_FILE);
+        DBConnection db      = new DBConnection(dbConfig.getUrl(), dbConfig.getUsername(), dbConfig.getPassword());
 
         // --- Repository (JDBC) ---
-        JdbcHackathonRepository hackathonRepository = new JdbcHackathonRepository(db);
-        JdbcGiudiceRepository giudiceRepository = new JdbcGiudiceRepository(db);
-        JdbcMentoreRepository mentoreRepository = new JdbcMentoreRepository(db);
+        JdbcHackathonRepository    hackathonRepository    = new JdbcHackathonRepository(db);
+        JdbcGiudiceRepository      giudiceRepository      = new JdbcGiudiceRepository(db);
+        JdbcMentoreRepository      mentoreRepository      = new JdbcMentoreRepository(db);
         JdbcOrganizzatoreRepository organizzatoreRepository = new JdbcOrganizzatoreRepository(db);
-        JdbcTeamRepository teamRepository = new JdbcTeamRepository(db);
+        JdbcTeamRepository         teamRepository         = new JdbcTeamRepository(db);
         JdbcSottomissioneRepository sottomissioneRepository = new JdbcSottomissioneRepository(db);
+        JdbcUserRepository         userRepository         = new JdbcUserRepository(db);
+        JdbcInvitoRepository       invitoRepository       = new JdbcInvitoRepository(db);
 
-        // --- Service (Constructor Injection) ---
+        // --- Servizi di supporto ---
         NotificationsService notificationsService = new NotificationsService();
+        PasswordEncoder      passwordEncoder      = new PasswordEncoder();
+        OAuthService         oauthService         = new OAuthService();
 
+        // --- Service layer (Constructor Injection) ---
         HackathonService hackathonService = new HackathonService(
                 hackathonRepository,
                 giudiceRepository,
@@ -68,10 +63,25 @@ public class HackHubApplication {
                 notificationsService
         );
 
-        // --- Controller (Constructor Injection) ---
-        HackathonController hackathonController = new HackathonController(hackathonService);
+        UtenteService utenteService = new UtenteService(
+                userRepository,
+                passwordEncoder
+        );
+
+        TeamService teamService = new TeamService(
+                hackathonRepository,
+                teamRepository,
+                userRepository,
+                invitoRepository,
+                notificationsService
+        );
+
+        // --- Controller layer (Constructor Injection) ---
+        HackathonController     hackathonController     = new HackathonController(hackathonService);
         SottomissioneController sottomissioneController = new SottomissioneController(sottomissioneService);
         ProclamazioneController proclamazioneController = new ProclamazioneController(proclamazioneService);
+        RegistrationController  registrationController  = new RegistrationController(utenteService, oauthService);
+        TeamController          teamController          = new TeamController(teamService);
 
         System.out.println("HackHub avviato. Connessione DB: " + dbConfig.getUrl());
     }

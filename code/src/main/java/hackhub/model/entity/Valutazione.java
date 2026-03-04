@@ -5,23 +5,26 @@ import java.util.UUID;
 public class Valutazione {
 
     private final UUID id;
-    private final double voto;
+    private final double punteggio;
     private final String giudizioScritto;
     private final UUID idSottomissione;
+    private final UUID idGiudice;
 
-    public Valutazione(UUID id, double voto, String giudizioScritto, UUID idSottomissione) {
+    public Valutazione(UUID id, double voto, String giudizioScritto,
+                       UUID idSottomissione, UUID idGiudice) {
         this.id = id;
-        this.voto = voto;
+        this.punteggio = voto;
         this.giudizioScritto = giudizioScritto;
         this.idSottomissione = idSottomissione;
+        this.idGiudice = idGiudice;
     }
 
     public UUID getId() {
         return id;
     }
 
-    public double getVoto() {
-        return voto;
+    public double getPunteggio() {
+        return punteggio;
     }
 
     public String getGiudizioScritto() {
@@ -30,5 +33,9 @@ public class Valutazione {
 
     public UUID getIdSottomissione() {
         return idSottomissione;
+    }
+
+    public UUID getIdGiudice() {
+        return idGiudice;
     }
 }

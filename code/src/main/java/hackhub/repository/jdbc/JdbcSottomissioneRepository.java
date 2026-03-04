@@ -5,6 +5,8 @@ import hackhub.model.entity.Sottomissione;
 import hackhub.repository.SottomissioneRepository;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,8 +43,8 @@ public class JdbcSottomissioneRepository implements SottomissioneRepository {
     public void save(Sottomissione s) {
         String sql = """
                 INSERT INTO sottomissione
-                    (link_repo, link_demo, descrizione, data_invio, id_team, id_hackathon, vincitore)
-                VALUES (?, ?, ?, ?, ?, ?, false)
+                    (link_repo, link_demo, descrizione, data_invio, id_team, id_hackathon, vincitore, valutato)
+                VALUES (?, ?, ?, ?, ?, ?, false, false)
                 RETURNING id
                 """;
 
@@ -85,12 +87,7 @@ public class JdbcSottomissioneRepository implements SottomissioneRepository {
 
     @Override
     public long countNonValutate(UUID idHackathon) {
-        String sql = """
-                SELECT COUNT(*)
-                FROM sottomissione s
-                LEFT JOIN valutazione v ON v.id_sottomissione = s.id
-                WHERE s.id_hackathon = ? AND v.id IS NULL
-                """;
+        String sql = "SELECT COUNT(*) FROM sottomissione WHERE id_hackathon = ? AND valutato = false";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -106,7 +103,6 @@ public class JdbcSottomissioneRepository implements SottomissioneRepository {
 
     @Override
     public Optional<Sottomissione> findVincitore(UUID idHackathon) {
-        // Restituisce la sottomissione con il voto più alto per l'hackathon dato.
         String sql = """
                 SELECT s.*
                 FROM sottomissione s
@@ -147,6 +143,44 @@ public class JdbcSottomissioneRepository implements SottomissioneRepository {
         }
     }
 
+    @Override
+    public void markAsValutata(UUID idSottomissione) {
+        String sql = "UPDATE sottomissione SET valutato = true WHERE id = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idSottomissione);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Errore durante l'aggiornamento del flag valutato: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<Sottomissione> findSottomissioniDaValutare(UUID idHackathon, UUID idGiudice) {
+        // Restituisce sottomissioni non ancora valutate per l'hackathon.
+        // idGiudice usato per futuri controlli di assegnazione (non implementato in questa iterazione).
+        String sql = "SELECT * FROM sottomissione WHERE id_hackathon = ? AND valutato = false";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idHackathon);
+            ResultSet rs = stmt.executeQuery();
+
+            List<Sottomissione> risultato = new ArrayList<>();
+            while (rs.next()) {
+                risultato.add(mapRow(rs));
+            }
+            return risultato;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Errore durante il recupero delle sottomissioni da valutare: " + e.getMessage(), e);
+        }
+    }
+
     private Sottomissione mapRow(ResultSet rs) throws SQLException {
         return new Sottomissione(
                 (UUID) rs.getObject("id"),
@@ -156,7 +190,8 @@ public class JdbcSottomissioneRepository implements SottomissioneRepository {
                 rs.getTimestamp("data_invio").toLocalDateTime(),
                 (UUID) rs.getObject("id_team"),
                 (UUID) rs.getObject("id_hackathon"),
-                rs.getBoolean("vincitore")
+                rs.getBoolean("vincitore"),
+                rs.getBoolean("valutato")
         );
     }
 }

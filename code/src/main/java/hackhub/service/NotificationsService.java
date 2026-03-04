@@ -1,8 +1,11 @@
 package hackhub.service;
 
 import hackhub.model.entity.Hackathon;
+import hackhub.model.entity.Invito;
 import hackhub.model.entity.Team;
 
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -42,5 +45,41 @@ public class NotificationsService {
                 hackathon.getPremio(),
                 hackathon.getStatoEnum()
         ));
+    }
+
+    /**
+     * Notifica gli utenti invitati a unirsi a un team.
+     * Per ogni invito viene emesso un log; in produzione andrà sostituito
+     * con l'invio di email o push notification.
+     */
+    public void inviaInvitiTeam(Team team, List<Invito> inviti) {
+        if (inviti == null || inviti.isEmpty()) {
+            LOG.info(String.format(
+                    "Team '%s' (id: %s) creato senza inviti. " +
+                    "Il leader parteciperà da solo o inviterà membri successivamente.",
+                    team.getNome(), team.getId()));
+            return;
+        }
+
+        for (Invito invito : inviti) {
+            LOG.info(String.format(
+                    "Invito inviato: utente %s invitato a unirsi al team '%s' (id: %s) " +
+                    "per l'hackathon %s — stato invito: %s",
+                    invito.getIdUtente(),
+                    team.getNome(),
+                    team.getId(),
+                    invito.getIdHackathon(),
+                    invito.getStato()
+            ));
+        }
+    }
+
+    /**
+     * Notifica l'organizzatore della ricezione di una nuova segnalazione di violazione.
+     */
+    public void notificaOrganizzatore(UUID organizzatoreId, UUID segnalazioneId) {
+        LOG.info(String.format(
+                "Nuova segnalazione (id: %s) inoltrata all'organizzatore (id: %s) per revisione.",
+                segnalazioneId, organizzatoreId));
     }
 }
