@@ -96,9 +96,9 @@ class HackathonServiceTest {
 
             // Then
             assertNotNull(response);
-            assertNotNull(response.getId());
-            assertEquals("Hackathon Test", response.getNome());
-            assertEquals(StatoHackathon.IN_ISCRIZIONE, response.getStato());
+            assertNotNull(response.id());
+            assertEquals("Hackathon Test", response.nome());
+            assertEquals(StatoHackathon.IN_ISCRIZIONE, response.stato());
             verify(hackathonRepository).save(any(Hackathon.class));
             verify(notificationsService).notificaStaff(any(Hackathon.class));
         }
@@ -226,11 +226,11 @@ class HackathonServiceTest {
 
             // Then
             assertNotNull(form);
-            assertEquals("Luca Verdi", form.getNomeOrganizzatore());
-            assertEquals(1, form.getGiudiciDisponibili().size());
-            assertEquals(1, form.getMentoriDisponibili().size());
-            GiudiceDTO giudiceDto = form.getGiudiciDisponibili().get(0);
-            assertEquals("Sara", giudiceDto.getNome());
+            assertEquals("Luca Verdi", form.nomeOrganizzatore());
+            assertEquals(1, form.giudiciDisponibili().size());
+            assertEquals(1, form.mentoriDisponibili().size());
+            GiudiceDTO giudiceDto = form.giudiciDisponibili().get(0);
+            assertEquals("Sara", giudiceDto.nome());
         }
 
         @Test
