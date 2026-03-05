@@ -48,3 +48,5 @@ src/test/resources/application.properties
 
 .clauderules
 CLAUDE.md
+.claude/
+claude

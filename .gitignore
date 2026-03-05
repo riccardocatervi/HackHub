@@ -95,6 +95,9 @@ build/
 
 # Visual Studio Code
 .vscode/
+.clauderules
+.claude/
+CLAUDE.md
 *.code-workspace
 .history/
 
@@ -121,6 +124,6 @@ dist/
 nbdist/
 .nb-gradle/
 
-.clauderules
-.claude
-CLAUDE.md
+
+
+
