@@ -29,10 +29,10 @@ import java.util.UUID;
  */
 public class TeamService {
 
-    private final HackathonRepository  hackathonRepository;
-    private final TeamRepository       teamRepository;
-    private final UserRepository       userRepository;
-    private final InvitoRepository     invitoRepository;
+    private final HackathonRepository hackathonRepository;
+    private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
+    private final InvitoRepository invitoRepository;
     private final NotificationsService notificationsService;
 
     public TeamService(HackathonRepository hackathonRepository,
@@ -40,10 +40,10 @@ public class TeamService {
                        UserRepository userRepository,
                        InvitoRepository invitoRepository,
                        NotificationsService notificationsService) {
-        this.hackathonRepository  = hackathonRepository;
-        this.teamRepository       = teamRepository;
-        this.userRepository       = userRepository;
-        this.invitoRepository     = invitoRepository;
+        this.hackathonRepository = hackathonRepository;
+        this.teamRepository = teamRepository;
+        this.userRepository = userRepository;
+        this.invitoRepository = invitoRepository;
         this.notificationsService = notificationsService;
     }
 
@@ -212,7 +212,7 @@ public class TeamService {
         if (hackathon.getStatoEnum() != StatoHackathon.IN_ISCRIZIONE) {
             throw new InvalidHackathonStateException(
                     "L'hackathon '" + hackathon.getNome() + "' non è in fase di iscrizione. " +
-                    "Stato attuale: " + hackathon.getStatoEnum());
+                            "Stato attuale: " + hackathon.getStatoEnum());
         }
     }
 
@@ -228,7 +228,7 @@ public class TeamService {
             if (!userRepository.isUserAvailable(idUtente, idHackathon)) {
                 throw new UserAlreadyInTeamException(
                         "L'utente " + idUtente + " è già membro di un team per questo hackathon " +
-                        "e non può essere invitato.");
+                                "e non può essere invitato.");
             }
         }
     }

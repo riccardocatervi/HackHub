@@ -38,10 +38,10 @@ public class ValutazioneService {
     private static final double PUNTEGGIO_MIN = 0.0;
     private static final double PUNTEGGIO_MAX = 10.0;
 
-    private final ValutazioneRepository   valutazioneRepository;
+    private final ValutazioneRepository valutazioneRepository;
     private final SottomissioneRepository sottomissioneRepository;
-    private final HackathonRepository     hackathonRepository;
-    private final TeamRepository          teamRepository;
+    private final HackathonRepository hackathonRepository;
+    private final TeamRepository teamRepository;
 
     private final List<ValutazioneObserver> observers = new ArrayList<>();
 
@@ -49,10 +49,10 @@ public class ValutazioneService {
                               SottomissioneRepository sottomissioneRepository,
                               HackathonRepository hackathonRepository,
                               TeamRepository teamRepository) {
-        this.valutazioneRepository  = valutazioneRepository;
+        this.valutazioneRepository = valutazioneRepository;
         this.sottomissioneRepository = sottomissioneRepository;
-        this.hackathonRepository    = hackathonRepository;
-        this.teamRepository         = teamRepository;
+        this.hackathonRepository = hackathonRepository;
+        this.teamRepository = teamRepository;
     }
 
     /**
@@ -68,8 +68,8 @@ public class ValutazioneService {
      * Ogni item include il flag {@code valutato} per consentire alla vista di
      * differenziare graficamente le voci già gestite da quelle ancora in attesa.
      *
-     * @param hackathonId  id dell'hackathon di cui visualizzare le sottomissioni
-     * @param giudiceId    id del giudice che accede alla dashboard
+     * @param hackathonId id dell'hackathon di cui visualizzare le sottomissioni
+     * @param giudiceId   id del giudice che accede alla dashboard
      * @return DTO con nome hackathon e lista completa delle sottomissioni
      */
     public SottomissioniDaValutareDTO getSottomissioniDaValutare(UUID hackathonId, UUID giudiceId) {
@@ -80,7 +80,7 @@ public class ValutazioneService {
         if (hackathon.getStatoEnum() != StatoHackathon.IN_VALUTAZIONE) {
             throw new InvalidHackathonStateException(
                     "Le valutazioni sono disponibili solo quando l'hackathon è in stato IN_VALUTAZIONE. " +
-                    "Stato attuale: " + hackathon.getStatoEnum());
+                            "Stato attuale: " + hackathon.getStatoEnum());
         }
 
         List<Sottomissione> sottomissioni = sottomissioneRepository.findAllByHackathon(hackathonId);
@@ -109,7 +109,7 @@ public class ValutazioneService {
      * Valida e salva la valutazione assegnata dal giudice a una sottomissione.
      * Segna la sottomissione come valutata e notifica gli osservatori.
      *
-     * @param request  dati inseriti dal giudice (punteggio, giudizio, riferimenti)
+     * @param request dati inseriti dal giudice (punteggio, giudizio, riferimenti)
      * @return DTO di conferma con i dati della valutazione salvata
      */
     public ValutazioneResponseDTO valutaSottomissione(ValutazioneRequestDTO request) {
@@ -122,7 +122,7 @@ public class ValutazioneService {
         if (hackathon.getStatoEnum() != StatoHackathon.IN_VALUTAZIONE) {
             throw new InvalidHackathonStateException(
                     "La valutazione è consentita solo quando l'hackathon è in stato IN_VALUTAZIONE. " +
-                    "Stato attuale: " + hackathon.getStatoEnum());
+                            "Stato attuale: " + hackathon.getStatoEnum());
         }
 
         Sottomissione sottomissione = sottomissioneRepository.findById(request.sottomissioneId())
@@ -132,7 +132,7 @@ public class ValutazioneService {
         if (sottomissione.isValutato()) {
             throw new AlreadyEvaluatedException(
                     "La sottomissione " + request.sottomissioneId() +
-                    " è già stata valutata e non può essere rivalutata.");
+                            " è già stata valutata e non può essere rivalutata.");
         }
 
         // Recupera il nome del team per il DTO di risposta

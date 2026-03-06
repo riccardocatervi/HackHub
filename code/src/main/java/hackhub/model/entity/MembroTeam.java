@@ -9,39 +9,17 @@ import java.util.UUID;
  * I dati anagrafici sono copiati dall'entità Utente al momento del caricamento
  * (lettura lazy tramite JOIN nel repository).
  */
-public class MembroTeam {
+public class MembroTeam extends Attore {
 
-    private final UUID idUtente;
     private final UUID idTeam;
-    private final String nome;
-    private final String cognome;
-    private final String email;
 
     public MembroTeam(UUID idUtente, UUID idTeam, String nome, String cognome, String email) {
-        this.idUtente = idUtente;
+        super(idUtente, nome, cognome, email);
         this.idTeam = idTeam;
-        this.nome = nome;
-        this.cognome = cognome;
-        this.email = email;
-    }
-
-    public UUID getIdUtente() {
-        return idUtente;
     }
 
     public UUID getIdTeam() {
         return idTeam;
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public String getCognome() {
-        return cognome;
-    }
-
-    public String getEmail() {
-        return email;
-    }
 }

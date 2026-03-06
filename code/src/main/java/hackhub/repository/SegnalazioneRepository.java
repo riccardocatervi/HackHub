@@ -6,13 +6,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface SegnalazioneRepository {
+public interface SegnalazioneRepository extends GenericRepository<Segnalazione, UUID>{
 
     /** Persiste una nuova segnalazione e imposta l'id generato dal DB sull'entità. */
     void save(Segnalazione segnalazione);
-
-    /** Recupera una segnalazione per id. */
-    Optional<Segnalazione> findById(UUID segnalazioneId);
 
     /** Restituisce tutte le segnalazioni relative a un determinato hackathon. */
     List<Segnalazione> findByHackathon(UUID idHackathon);
