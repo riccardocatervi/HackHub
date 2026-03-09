@@ -146,7 +146,7 @@ public class HackathonService {
                 h.getRegolamento(),
                 h.getIdOrganizzatore(),
                 h.getIdGiudice(),
-                h.getIdMentori(),
+                h.getIdsMentori(),
                 h.getStatoEnum()
         );
     }

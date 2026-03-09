@@ -31,7 +31,7 @@ public class Hackathon {
     private final String regolamento;
     private final UUID idOrganizzatore;
     private final UUID idGiudice;
-    private final List<UUID> idMentori;
+    private final List<UUID> idsMentori;
     private HackathonState stato;
 
     /**
@@ -61,7 +61,7 @@ public class Hackathon {
         this.regolamento = regolamento;
         this.idOrganizzatore = idOrganizzatore;
         this.idGiudice = idGiudice;
-        this.idMentori = idMentori;
+        this.idsMentori = idMentori;
         this.stato = new StatoInIscrizione();
     }
 
@@ -200,8 +200,8 @@ public class Hackathon {
         return idGiudice;
     }
 
-    public List<UUID> getIdMentori() {
-        return idMentori;
+    public List<UUID> getIdsMentori() {
+        return idsMentori;
     }
 
     public HackathonState getStato() {

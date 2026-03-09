@@ -45,7 +45,7 @@ public class EquipeBuilder {
     private UUID idHackathon;
     private int dimensioneMaxTeam;
 
-    private final List<UUID> idUtentiInvitati = new ArrayList<>();
+    private final List<UUID> idsUtentiInvitati = new ArrayList<>();
 
     public EquipeBuilder nome(String nome) {
         this.nome = nome;
@@ -82,17 +82,17 @@ public class EquipeBuilder {
             throw new ValidationException(
                     "Il leader non può essere aggiunto come membro invitato: " + idUtente);
         }
-        if (idUtentiInvitati.contains(idUtente)) {
+        if (idsUtentiInvitati.contains(idUtente)) {
             throw new ValidationException(
                     "Utente già presente nella lista inviti: " + idUtente);
         }
         // Il leader occupa sempre uno slot: posizioni disponibili = max - 1
-        if (idUtentiInvitati.size() >= dimensioneMaxTeam - 1) {
+        if (idsUtentiInvitati.size() >= dimensioneMaxTeam - 1) {
             throw new MaxTeamSizeExceedException(
                     "Numero massimo di inviti raggiunto per questo hackathon " +
                             "(dimensione max team: " + dimensioneMaxTeam + ").");
         }
-        idUtentiInvitati.add(idUtente);
+        idsUtentiInvitati.add(idUtente);
         return this;
     }
 
@@ -111,7 +111,7 @@ public class EquipeBuilder {
         Team team = new Team(null, nome, descrizione, idLeader, idHackathon);
 
         // Gli inviti non hanno ancora l'idTeam: verrà impostato dopo il save del team
-        List<Invito> inviti = idUtentiInvitati.stream()
+        List<Invito> inviti = idsUtentiInvitati.stream()
                 .map(idUtente -> new Invito(null, idUtente, idHackathon))
                 .toList();
 

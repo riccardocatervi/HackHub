@@ -38,7 +38,7 @@ public class JdbcHackathonRepository implements HackathonRepository {
             try {
                 UUID idGenerato = inserisciHackathon(conn, sqlHackathon, hackathon);
                 hackathon.setId(idGenerato);
-                inserisciMentori(conn, idGenerato, hackathon.getIdMentori());
+                inserisciMentori(conn, idGenerato, hackathon.getIdsMentori());
                 conn.commit();
             } catch (SQLException ex) {
                 conn.rollback();
@@ -86,13 +86,13 @@ public class JdbcHackathonRepository implements HackathonRepository {
         }
     }
 
-    private void inserisciMentori(Connection conn, UUID idHackathon, List<UUID> idMentori)
+    private void inserisciMentori(Connection conn, UUID idHackathon, List<UUID> idsMentori)
             throws SQLException {
-        if (idMentori == null || idMentori.isEmpty()) return;
+        if (idsMentori == null || idsMentori.isEmpty()) return;
 
         String sql = "INSERT INTO hackathon_mentori (id_hackathon, id_mentore) VALUES (?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            for (UUID idMentore : idMentori) {
+            for (UUID idMentore : idsMentori) {
                 stmt.setObject(1, idHackathon);
                 stmt.setObject(2, idMentore);
                 stmt.addBatch();

@@ -36,7 +36,7 @@ public class NotificationsService implements SegnalazioneObserver, ValutazioneOb
                 hackathon.getId(),
                 hackathon.getStatoEnum(),
                 hackathon.getIdGiudice(),
-                hackathon.getIdMentori()
+                hackathon.getIdsMentori()
         ));
     }
 
