@@ -12,16 +12,30 @@ public class Address {
     private final String provincia;
 
     public Address(String via, int numeroCivico, String citta, String cap, String provincia) {
-        this.via          = via;
+        this.via = via;
         this.numeroCivico = numeroCivico;
-        this.citta        = citta;
-        this.cap          = cap;
-        this.provincia    = provincia;
+        this.citta = citta;
+        this.cap = cap;
+        this.provincia = provincia;
     }
 
-    public String getVia()          { return via; }
-    public int    getNumeroCivico() { return numeroCivico; }
-    public String getCitta()        { return citta; }
-    public String getCap()          { return cap; }
-    public String getProvincia()    { return provincia; }
+    public String getVia() {
+        return via;
+    }
+
+    public int getNumeroCivico() {
+        return numeroCivico;
+    }
+
+    public String getCitta() {
+        return citta;
+    }
+
+    public String getCap() {
+        return cap;
+    }
+
+    public String getProvincia() {
+        return provincia;
+    }
 }

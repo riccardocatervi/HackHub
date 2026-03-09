@@ -16,7 +16,7 @@ public class StatoInCorso implements HackathonState {
     @Override
     public void accettaProclamazione() {
         throw new IllegalStateTransitionException(
-            "Impossibile proclamare il vincitore: l'hackathon è ancora in corso."
+                "Impossibile proclamare il vincitore: l'hackathon è ancora in corso."
         );
     }
 

@@ -11,14 +11,14 @@ public class StatoConcluso implements HackathonState {
     @Override
     public void accettaSottomissione() {
         throw new IllegalStateTransitionException(
-            "Impossibile inviare una sottomissione: l'hackathon è già concluso."
+                "Impossibile inviare una sottomissione: l'hackathon è già concluso."
         );
     }
 
     @Override
     public void accettaProclamazione() {
         throw new IllegalStateTransitionException(
-            "Impossibile proclamare il vincitore: l'hackathon è già concluso."
+                "Impossibile proclamare il vincitore: l'hackathon è già concluso."
         );
     }
 

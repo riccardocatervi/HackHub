@@ -39,11 +39,11 @@ public class JdbcTeamRepository implements TeamRepository {
     @Override
     public Optional<Team> findByHackathonAndMembro(UUID idHackathon, UUID idMembro) {
         String sql = """
-            SELECT t.*
-            FROM team t
-            JOIN membro_team mt ON mt.id_team = t.id
-            WHERE t.id_hackathon = ? AND mt.id = ?
-            """;
+                SELECT t.*
+                FROM team t
+                JOIN membro_team mt ON mt.id_team = t.id
+                WHERE t.id_hackathon = ? AND mt.id = ?
+                """;
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -64,11 +64,11 @@ public class JdbcTeamRepository implements TeamRepository {
 
     private Team mapRow(ResultSet rs) throws SQLException {
         return new Team(
-            (UUID) rs.getObject("id"),
-            rs.getString("nome"),
-            rs.getString("descrizione"),
-            (UUID) rs.getObject("id_leader"),
-            (UUID) rs.getObject("id_hackathon")
+                (UUID) rs.getObject("id"),
+                rs.getString("nome"),
+                rs.getString("descrizione"),
+                (UUID) rs.getObject("id_leader"),
+                (UUID) rs.getObject("id_hackathon")
         );
     }
 }

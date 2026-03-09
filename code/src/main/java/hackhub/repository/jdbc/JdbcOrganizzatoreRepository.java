@@ -38,10 +38,10 @@ public class JdbcOrganizzatoreRepository implements OrganizzatoreRepository {
 
     private Organizzatore mapRow(ResultSet rs) throws SQLException {
         return new Organizzatore(
-            (UUID) rs.getObject("id"),
-            rs.getString("nome"),
-            rs.getString("cognome"),
-            rs.getString("email")
+                (UUID) rs.getObject("id"),
+                rs.getString("nome"),
+                rs.getString("cognome"),
+                rs.getString("email")
         );
     }
 }

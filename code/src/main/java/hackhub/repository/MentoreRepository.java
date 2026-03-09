@@ -7,6 +7,8 @@ import java.util.UUID;
 
 public interface MentoreRepository extends GenericRepository<Mentore, UUID> {
 
-    /** Restituisce tutti i mentori con disponibilità = true. */
+    /**
+     * Restituisce tutti i mentori con disponibilità = true.
+     */
     List<Mentore> findAllDisponibili();
 }

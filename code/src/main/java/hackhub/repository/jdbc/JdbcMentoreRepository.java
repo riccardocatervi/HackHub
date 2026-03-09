@@ -59,10 +59,10 @@ public class JdbcMentoreRepository implements MentoreRepository {
 
     private Mentore mapRow(ResultSet rs) throws SQLException {
         return new Mentore(
-            (UUID) rs.getObject("id"),
-            rs.getString("nome"),
-            rs.getString("cognome"),
-            rs.getBoolean("disponibile")
+                (UUID) rs.getObject("id"),
+                rs.getString("nome"),
+                rs.getString("cognome"),
+                rs.getBoolean("disponibile")
         );
     }
 }

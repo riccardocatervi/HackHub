@@ -5,7 +5,7 @@ import java.util.Optional;
 /**
  * Interfaccia base per tutti i repository del dominio.
  * Definisce l'operazione di ricerca per identificatore, comune a ogni repository.
- *
+ * <p>
  * Estende questa interfaccia per aggiungere operazioni specifiche per ogni aggregato
  * (es. query di dominio, metodi di scrittura) rispettando il principio ISP.
  *

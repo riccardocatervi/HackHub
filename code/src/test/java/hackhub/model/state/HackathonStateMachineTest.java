@@ -27,20 +27,20 @@ class HackathonStateMachineTest {
 
     private static Hackathon hackathonConStato(HackathonState stato) {
         return new Hackathon(
-            UUID.randomUUID(),
-            "Hackathon di Test",
-            BASE.plusDays(10),
-            BASE.plusDays(20),
-            BASE.plusDays(5),
-            BASE.plusDays(15),
-            1000.0,
-            null,
-            5,
-            "Regolamento di test",
-            UUID.randomUUID(),
-            UUID.randomUUID(),
-            List.of(),
-            stato
+                UUID.randomUUID(),
+                "Hackathon di Test",
+                BASE.plusDays(10),
+                BASE.plusDays(20),
+                BASE.plusDays(5),
+                BASE.plusDays(15),
+                1000.0,
+                null,
+                5,
+                "Regolamento di test",
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                List.of(),
+                stato
         );
     }
 
@@ -57,7 +57,7 @@ class HackathonStateMachineTest {
         void statoInIscrizione_lancia() {
             Hackathon h = hackathonConStato(new StatoInIscrizione());
             assertThrows(IllegalStateTransitionException.class,
-                h::verificaAccettaSottomissione);
+                    h::verificaAccettaSottomissione);
         }
 
         @Test
@@ -72,7 +72,7 @@ class HackathonStateMachineTest {
         void statoInValutazione_lancia() {
             Hackathon h = hackathonConStato(new StatoInValutazione());
             assertThrows(IllegalStateTransitionException.class,
-                h::verificaAccettaSottomissione);
+                    h::verificaAccettaSottomissione);
         }
 
         @Test
@@ -80,7 +80,7 @@ class HackathonStateMachineTest {
         void statoConcluso_lancia() {
             Hackathon h = hackathonConStato(new StatoConcluso());
             assertThrows(IllegalStateTransitionException.class,
-                h::verificaAccettaSottomissione);
+                    h::verificaAccettaSottomissione);
         }
     }
 
@@ -97,7 +97,7 @@ class HackathonStateMachineTest {
         void statoInIscrizione_lancia() {
             Hackathon h = hackathonConStato(new StatoInIscrizione());
             assertThrows(IllegalStateTransitionException.class,
-                h::verificaAccettaProclamazione);
+                    h::verificaAccettaProclamazione);
         }
 
         @Test
@@ -105,7 +105,7 @@ class HackathonStateMachineTest {
         void statoInCorso_lancia() {
             Hackathon h = hackathonConStato(new StatoInCorso());
             assertThrows(IllegalStateTransitionException.class,
-                h::verificaAccettaProclamazione);
+                    h::verificaAccettaProclamazione);
         }
 
         @Test
@@ -120,7 +120,7 @@ class HackathonStateMachineTest {
         void statoConcluso_lancia() {
             Hackathon h = hackathonConStato(new StatoConcluso());
             assertThrows(IllegalStateTransitionException.class,
-                h::verificaAccettaProclamazione);
+                    h::verificaAccettaProclamazione);
         }
     }
 
@@ -227,37 +227,37 @@ class HackathonStateMachineTest {
         @DisplayName("creaIstanza() restituisce StatoInIscrizione per IN_ISCRIZIONE")
         void inIscrizione_creaIstanzaCorretta() {
             assertInstanceOf(StatoInIscrizione.class,
-                StatoHackathon.IN_ISCRIZIONE.creaIstanza());
+                    StatoHackathon.IN_ISCRIZIONE.creaIstanza());
         }
 
         @Test
         @DisplayName("creaIstanza() restituisce StatoInCorso per IN_CORSO")
         void inCorso_creaIstanzaCorretta() {
             assertInstanceOf(StatoInCorso.class,
-                StatoHackathon.IN_CORSO.creaIstanza());
+                    StatoHackathon.IN_CORSO.creaIstanza());
         }
 
         @Test
         @DisplayName("creaIstanza() restituisce StatoInValutazione per IN_VALUTAZIONE")
         void inValutazione_creaIstanzaCorretta() {
             assertInstanceOf(StatoInValutazione.class,
-                StatoHackathon.IN_VALUTAZIONE.creaIstanza());
+                    StatoHackathon.IN_VALUTAZIONE.creaIstanza());
         }
 
         @Test
         @DisplayName("creaIstanza() restituisce StatoConcluso per CONCLUSO")
         void concluso_creaIstanzaCorretta() {
             assertInstanceOf(StatoConcluso.class,
-                StatoHackathon.CONCLUSO.creaIstanza());
+                    StatoHackathon.CONCLUSO.creaIstanza());
         }
 
         @Test
         @DisplayName("getNome() di ogni stato corrisponde al valore enum")
         void getNome_corrispondeAllEnum() {
-            assertEquals(StatoHackathon.IN_ISCRIZIONE,  new StatoInIscrizione().getNome());
-            assertEquals(StatoHackathon.IN_CORSO,       new StatoInCorso().getNome());
+            assertEquals(StatoHackathon.IN_ISCRIZIONE, new StatoInIscrizione().getNome());
+            assertEquals(StatoHackathon.IN_CORSO, new StatoInCorso().getNome());
             assertEquals(StatoHackathon.IN_VALUTAZIONE, new StatoInValutazione().getNome());
-            assertEquals(StatoHackathon.CONCLUSO,       new StatoConcluso().getNome());
+            assertEquals(StatoHackathon.CONCLUSO, new StatoConcluso().getNome());
         }
     }
 
@@ -269,10 +269,10 @@ class HackathonStateMachineTest {
     @DisplayName("Nuovo Hackathon parte sempre con stato IN_ISCRIZIONE")
     void nuovoHackathon_iniziaInIscrizione() {
         Hackathon h = new Hackathon(
-            "Test", BASE.plusDays(10), BASE.plusDays(20),
-            BASE.plusDays(5), BASE.plusDays(15),
-            500.0, null, 3, "Regolamento",
-            UUID.randomUUID(), UUID.randomUUID(), List.of()
+                "Test", BASE.plusDays(10), BASE.plusDays(20),
+                BASE.plusDays(5), BASE.plusDays(15),
+                500.0, null, 3, "Regolamento",
+                UUID.randomUUID(), UUID.randomUUID(), List.of()
         );
         assertEquals(StatoHackathon.IN_ISCRIZIONE, h.getStatoEnum());
     }

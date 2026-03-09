@@ -40,27 +40,32 @@ import static org.mockito.Mockito.*;
 @DisplayName("HackathonService — Organizzare Hackathon")
 class HackathonServiceTest {
 
-    @Mock private HackathonRepository     hackathonRepository;
-    @Mock private GiudiceRepository       giudiceRepository;
-    @Mock private MentoreRepository       mentoreRepository;
-    @Mock private OrganizzatoreRepository organizzatoreRepository;
-    @Mock private NotificationsService    notificationsService;
+    @Mock
+    private HackathonRepository hackathonRepository;
+    @Mock
+    private GiudiceRepository giudiceRepository;
+    @Mock
+    private MentoreRepository mentoreRepository;
+    @Mock
+    private OrganizzatoreRepository organizzatoreRepository;
+    @Mock
+    private NotificationsService notificationsService;
 
     private HackathonService hackathonService;
 
     private static final LocalDateTime BASE = LocalDateTime.now();
-    private static final UUID ID_GIUDICE  = UUID.randomUUID();
-    private static final UUID ID_MENTORE  = UUID.randomUUID();
-    private static final UUID ID_ORG      = UUID.randomUUID();
+    private static final UUID ID_GIUDICE = UUID.randomUUID();
+    private static final UUID ID_MENTORE = UUID.randomUUID();
+    private static final UUID ID_ORG = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
         hackathonService = new HackathonService(
-            hackathonRepository,
-            giudiceRepository,
-            mentoreRepository,
-            organizzatoreRepository,
-            notificationsService
+                hackathonRepository,
+                giudiceRepository,
+                mentoreRepository,
+                organizzatoreRepository,
+                notificationsService
         );
     }
 
@@ -105,7 +110,7 @@ class HackathonServiceTest {
             when(giudiceRepository.findById(ID_GIUDICE)).thenReturn(Optional.empty());
 
             assertThrows(HackathonNotFoundException.class,
-                () -> hackathonService.creaHackathon(dto));
+                    () -> hackathonService.creaHackathon(dto));
             verify(hackathonRepository, never()).save(any());
         }
 
@@ -114,10 +119,10 @@ class HackathonServiceTest {
         void giudiceNonDisponibile_lancia() {
             HackathonSubmissionDTO dto = buildDtoValido();
             when(giudiceRepository.findById(ID_GIUDICE))
-                .thenReturn(Optional.of(new Giudice(ID_GIUDICE, "Mario", "Rossi", false)));
+                    .thenReturn(Optional.of(new Giudice(ID_GIUDICE, "Mario", "Rossi", false)));
 
             assertThrows(IllegalArgumentException.class,
-                () -> hackathonService.creaHackathon(dto));
+                    () -> hackathonService.creaHackathon(dto));
             verify(hackathonRepository, never()).save(any());
         }
 
@@ -129,7 +134,7 @@ class HackathonServiceTest {
             when(mentoreRepository.findById(ID_MENTORE)).thenReturn(Optional.empty());
 
             assertThrows(HackathonNotFoundException.class,
-                () -> hackathonService.creaHackathon(dto));
+                    () -> hackathonService.creaHackathon(dto));
             verify(hackathonRepository, never()).save(any());
         }
 
@@ -139,10 +144,10 @@ class HackathonServiceTest {
             HackathonSubmissionDTO dto = buildDtoValido();
             stubGiudiceDisponibile();
             when(mentoreRepository.findById(ID_MENTORE))
-                .thenReturn(Optional.of(new Mentore(ID_MENTORE, "Anna", "Bianchi", false)));
+                    .thenReturn(Optional.of(new Mentore(ID_MENTORE, "Anna", "Bianchi", false)));
 
             assertThrows(IllegalArgumentException.class,
-                () -> hackathonService.creaHackathon(dto));
+                    () -> hackathonService.creaHackathon(dto));
             verify(hackathonRepository, never()).save(any());
         }
     }
@@ -163,7 +168,7 @@ class HackathonServiceTest {
             dto.setDataFine(BASE.plusDays(10));
 
             assertThrows(IllegalArgumentException.class,
-                () -> hackathonService.creaHackathon(dto));
+                    () -> hackathonService.creaHackathon(dto));
         }
 
         @Test
@@ -173,7 +178,7 @@ class HackathonServiceTest {
             dto.setScadenzaIscrizioni(BASE.plusDays(12)); // dopo dataInizio (plusDays(10))
 
             assertThrows(IllegalArgumentException.class,
-                () -> hackathonService.creaHackathon(dto));
+                    () -> hackathonService.creaHackathon(dto));
         }
 
         @Test
@@ -183,7 +188,7 @@ class HackathonServiceTest {
             dto.setScadenzaSottomissioni(BASE.plusDays(5)); // prima di dataInizio (plusDays(10))
 
             assertThrows(IllegalArgumentException.class,
-                () -> hackathonService.creaHackathon(dto));
+                    () -> hackathonService.creaHackathon(dto));
         }
 
         @Test
@@ -193,7 +198,7 @@ class HackathonServiceTest {
             dto.setScadenzaSottomissioni(BASE.plusDays(25)); // dopo dataFine (plusDays(20))
 
             assertThrows(IllegalArgumentException.class,
-                () -> hackathonService.creaHackathon(dto));
+                    () -> hackathonService.creaHackathon(dto));
         }
     }
 
@@ -210,11 +215,11 @@ class HackathonServiceTest {
         void organizzatoreEsiste_restituisceForm() {
             // Given
             when(organizzatoreRepository.findById(ID_ORG))
-                .thenReturn(Optional.of(new Organizzatore(ID_ORG, "Luca", "Verdi", "luca@test.it")));
+                    .thenReturn(Optional.of(new Organizzatore(ID_ORG, "Luca", "Verdi", "luca@test.it")));
             when(giudiceRepository.findAllDisponibili())
-                .thenReturn(List.of(new Giudice(ID_GIUDICE, "Sara", "Neri", true)));
+                    .thenReturn(List.of(new Giudice(ID_GIUDICE, "Sara", "Neri", true)));
             when(mentoreRepository.findAllDisponibili())
-                .thenReturn(List.of(new Mentore(ID_MENTORE, "Marco", "Blu", true)));
+                    .thenReturn(List.of(new Mentore(ID_MENTORE, "Marco", "Blu", true)));
 
             // When
             HackathonFormDataDTO form = hackathonService.getFormData(ID_ORG);
@@ -233,7 +238,7 @@ class HackathonServiceTest {
         void organizzatoreNonTrovato_lancia() {
             when(organizzatoreRepository.findById(ID_ORG)).thenReturn(Optional.empty());
             assertThrows(RuntimeException.class,
-                () -> hackathonService.getFormData(ID_ORG));
+                    () -> hackathonService.getFormData(ID_ORG));
         }
     }
 
@@ -260,11 +265,11 @@ class HackathonServiceTest {
 
     private void stubGiudiceDisponibile() {
         when(giudiceRepository.findById(ID_GIUDICE))
-            .thenReturn(Optional.of(new Giudice(ID_GIUDICE, "Mario", "Rossi", true)));
+                .thenReturn(Optional.of(new Giudice(ID_GIUDICE, "Mario", "Rossi", true)));
     }
 
     private void stubMentoreDisponibile() {
         when(mentoreRepository.findById(ID_MENTORE))
-            .thenReturn(Optional.of(new Mentore(ID_MENTORE, "Anna", "Bianchi", true)));
+                .thenReturn(Optional.of(new Mentore(ID_MENTORE, "Anna", "Bianchi", true)));
     }
 }
