@@ -13,6 +13,7 @@ public class Sottomissione {
     private final UUID idTeam;
     private final UUID idHackathon;
     private boolean vincitore;
+    private boolean valutato;
 
     /**
      * Costruttore per una nuova sottomissione (l'id verrà assegnato dal database).
@@ -30,6 +31,7 @@ public class Sottomissione {
         this.idTeam = idTeam;
         this.idHackathon = idHackathon;
         this.vincitore = false;
+        this.valutato = false;
     }
 
     /**
@@ -42,14 +44,20 @@ public class Sottomissione {
                          LocalDateTime dataInvio,
                          UUID idTeam,
                          UUID idHackathon,
-                         boolean vincitore) {
+                         boolean vincitore,
+                         boolean valutato) {
         this(linkRepo, linkDemo, descrizione, dataInvio, idTeam, idHackathon);
         this.id = id;
         this.vincitore = vincitore;
+        this.valutato = valutato;
     }
 
     public UUID getId() {
         return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getLinkRepo() {
@@ -80,7 +88,7 @@ public class Sottomissione {
         return vincitore;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public boolean isValutato() {
+        return valutato;
     }
 }

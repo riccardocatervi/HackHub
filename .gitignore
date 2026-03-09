@@ -36,6 +36,8 @@ $RECYCLE.BIN/
 *.vpp.old
 # Backup numerati (es. .vpp.vbak~1, ~2)
 *.vpp.vbak~*
+.memory/
+MEMORY.md
 
 # File ausiliari e di workspace
 *.vux
@@ -95,6 +97,9 @@ build/
 
 # Visual Studio Code
 .vscode/
+.clauderules
+.claude/
+CLAUDE.md
 *.code-workspace
 .history/
 
@@ -120,3 +125,7 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+
+
+

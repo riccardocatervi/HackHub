@@ -62,6 +62,7 @@ public class JdbcMentoreRepository implements MentoreRepository {
                 (UUID) rs.getObject("id"),
                 rs.getString("nome"),
                 rs.getString("cognome"),
+                rs.getString("email"),
                 rs.getBoolean("disponibile")
         );
     }

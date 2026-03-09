@@ -62,6 +62,7 @@ public class JdbcGiudiceRepository implements GiudiceRepository {
                 (UUID) rs.getObject("id"),
                 rs.getString("nome"),
                 rs.getString("cognome"),
+                rs.getString("email"),
                 rs.getBoolean("disponibile")
         );
     }
