@@ -36,6 +36,8 @@ $RECYCLE.BIN/
 *.vpp.old
 # Backup numerati (es. .vpp.vbak~1, ~2)
 *.vpp.vbak~*
+.memory/
+MEMORY.md
 
 # File ausiliari e di workspace
 *.vux
