@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public class Team {
 
-    private final UUID id;
+    private UUID id;           // assegnato dal DB al momento del salvataggio
     private final String nome;
     private final String descrizione;
     private final UUID idLeader;
@@ -22,6 +22,13 @@ public class Team {
 
     public UUID getId() {
         return id;
+    }
+
+    /**
+     * Chiamato dal repository dopo l'INSERT con RETURNING id.
+     */
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getNome() {

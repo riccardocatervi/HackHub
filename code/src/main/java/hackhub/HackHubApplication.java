@@ -1,20 +1,10 @@
 package hackhub;
 
-import hackhub.controller.HackathonController;
-import hackhub.controller.ProclamazioneController;
-import hackhub.controller.SottomissioneController;
+import hackhub.controller.*;
 import hackhub.infrastructure.db.DBConfig;
 import hackhub.infrastructure.db.DBConnection;
-import hackhub.repository.jdbc.JdbcGiudiceRepository;
-import hackhub.repository.jdbc.JdbcHackathonRepository;
-import hackhub.repository.jdbc.JdbcMentoreRepository;
-import hackhub.repository.jdbc.JdbcOrganizzatoreRepository;
-import hackhub.repository.jdbc.JdbcSottomissioneRepository;
-import hackhub.repository.jdbc.JdbcTeamRepository;
-import hackhub.service.HackathonService;
-import hackhub.service.NotificationsService;
-import hackhub.service.ProclamazioneService;
-import hackhub.service.SottomissioneService;
+import hackhub.repository.jdbc.*;
+import hackhub.service.*;
 
 /**
  * Punto di ingresso dell'applicazione HackHub (Java SE puro).
@@ -43,10 +33,17 @@ public class HackHubApplication {
         JdbcOrganizzatoreRepository organizzatoreRepository = new JdbcOrganizzatoreRepository(db);
         JdbcTeamRepository teamRepository = new JdbcTeamRepository(db);
         JdbcSottomissioneRepository sottomissioneRepository = new JdbcSottomissioneRepository(db);
+        JdbcUserRepository userRepository = new JdbcUserRepository(db);
+        JdbcInvitoRepository invitoRepository = new JdbcInvitoRepository(db);
+        JdbcSegnalazioneRepository segnalazioneRepository = new JdbcSegnalazioneRepository(db);
+        JdbcValutazioneRepository valutazioneRepository = new JdbcValutazioneRepository(db);
 
-        // --- Service (Constructor Injection) ---
+        // --- Servizi di supporto ---
         NotificationsService notificationsService = new NotificationsService();
+        PasswordEncoder passwordEncoder = new PasswordEncoder();
+        OAuthService oauthService = new OAuthService();
 
+        // --- Service layer (Constructor Injection) ---
         HackathonService hackathonService = new HackathonService(
                 hackathonRepository,
                 giudiceRepository,
@@ -68,10 +65,44 @@ public class HackHubApplication {
                 notificationsService
         );
 
-        // --- Controller (Constructor Injection) ---
+        UtenteService utenteService = new UtenteService(
+                userRepository,
+                passwordEncoder
+        );
+
+        TeamService teamService = new TeamService(
+                hackathonRepository,
+                teamRepository,
+                userRepository,
+                invitoRepository,
+                notificationsService
+        );
+
+        // Segnalazione: registra NotificationsService come observer (pattern GoF Observer)
+        SegnalazioneService segnalazioneService = new SegnalazioneService(
+                segnalazioneRepository,
+                teamRepository,
+                hackathonRepository
+        );
+        segnalazioneService.addObserver(notificationsService);
+
+        // Valutazione: registra NotificationsService come observer (pattern GoF Observer)
+        ValutazioneService valutazioneService = new ValutazioneService(
+                valutazioneRepository,
+                sottomissioneRepository,
+                hackathonRepository,
+                teamRepository
+        );
+        valutazioneService.addObserver(notificationsService);
+
+        // --- Controller layer (Constructor Injection) ---
         HackathonController hackathonController = new HackathonController(hackathonService);
         SottomissioneController sottomissioneController = new SottomissioneController(sottomissioneService);
         ProclamazioneController proclamazioneController = new ProclamazioneController(proclamazioneService);
+        RegistrationController registrationController = new RegistrationController(utenteService, oauthService);
+        TeamController teamController = new TeamController(teamService);
+        SegnalazioneController segnalazioneController = new SegnalazioneController(segnalazioneService);
+        ValutazioneController valutazioneController = new ValutazioneController(valutazioneService);
 
         System.out.println("HackHub avviato. Connessione DB: " + dbConfig.getUrl());
     }

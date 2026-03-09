@@ -92,10 +92,10 @@ class ProclamazioneServiceTest {
 
             // Then
             assertNotNull(response);
-            assertEquals(StatoHackathon.CONCLUSO, response.getStato());
-            assertEquals("Team Vincitore", response.getNomeTeamVincitore());
-            assertEquals(ID_TEAM, response.getIdTeamVincitore());
-            assertEquals(PREMIO, response.getPremio());
+            assertEquals(StatoHackathon.CONCLUSO, response.stato());
+            assertEquals("Team Vincitore", response.nomeTeamVincitore());
+            assertEquals(ID_TEAM, response.idTeamVincitore());
+            assertEquals(PREMIO, response.premio());
 
             // Verifica interazioni con i repository e il servizio notifiche
             verify(sottomissioneRepository).markAsVincitore(ID_SOTTOMISS);
@@ -177,9 +177,9 @@ class ProclamazioneServiceTest {
                     proclamazioneService.preparaProclamazione(ID_HACKATHON);
 
             assertNotNull(form);
-            assertEquals("Hackathon Test", form.getNomeHackathon());
-            assertEquals("Team Vincitore", form.getNomeTeamVincitore());
-            assertEquals(PREMIO, form.getPremio());
+            assertEquals("Hackathon Test", form.nomeHackathon());
+            assertEquals("Team Vincitore", form.nomeTeamVincitore());
+            assertEquals(PREMIO, form.premio());
         }
 
         @Test
@@ -217,7 +217,8 @@ class ProclamazioneServiceTest {
                 LocalDateTime.now().minusHours(2),
                 ID_TEAM,
                 ID_HACKATHON,
-                false
+                false,
+                true
         );
     }
 

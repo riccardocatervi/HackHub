@@ -2,30 +2,13 @@ package hackhub.model.entity;
 
 import java.util.UUID;
 
-public class Giudice {
+public class Giudice extends Attore {
 
-    private final UUID id;
-    private final String nome;
-    private final String cognome;
     private final boolean disponibile;
 
-    public Giudice(UUID id, String nome, String cognome, boolean disponibile) {
-        this.id = id;
-        this.nome = nome;
-        this.cognome = cognome;
+    public Giudice(UUID id, String nome, String cognome, String email, boolean disponibile) {
+        super(id, nome, cognome, email);
         this.disponibile = disponibile;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public String getCognome() {
-        return cognome;
     }
 
     public boolean isDisponibile() {
