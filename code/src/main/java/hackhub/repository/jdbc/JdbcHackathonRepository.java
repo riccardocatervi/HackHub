@@ -129,6 +129,33 @@ public class JdbcHackathonRepository implements HackathonRepository {
     }
 
     @Override
+    public List<Hackathon> findAllInIscrizione() {
+        String sql = """
+                SELECT h.*,
+                       array_remove(array_agg(hm.id_mentore), NULL) AS mentori
+                FROM hackathon h
+                LEFT JOIN hackathon_mentori hm ON hm.id_hackathon = h.id
+                WHERE h.stato = 'IN_ISCRIZIONE'
+                GROUP BY h.id
+                ORDER BY h.scadenza_iscrizioni ASC
+                """;
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            List<Hackathon> risultato = new ArrayList<>();
+            while (rs.next()) {
+                risultato.add(mapRow(rs));
+            }
+            return risultato;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Errore durante il recupero degli hackathon in iscrizione: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
     public void updateStato(UUID id, StatoHackathon stato) {
         String sql = "UPDATE hackathon SET stato = ? WHERE id = ?";
 
