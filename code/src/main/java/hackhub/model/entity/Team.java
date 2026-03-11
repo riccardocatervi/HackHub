@@ -11,6 +11,7 @@ public class Team {
     private final UUID idLeader;
     private final UUID idHackathon;
     private List<MembroTeam> membri;
+    private boolean squalificato;
 
     public Team(UUID id, String nome, String descrizione, UUID idLeader, UUID idHackathon) {
         this.id = id;
@@ -18,6 +19,7 @@ public class Team {
         this.descrizione = descrizione;
         this.idLeader = idLeader;
         this.idHackathon = idHackathon;
+        this.squalificato = false;
     }
 
     public UUID getId() {
@@ -53,5 +55,24 @@ public class Team {
 
     public void setMembri(List<MembroTeam> membri) {
         this.membri = membri;
+    }
+
+    public boolean isSqualificato() {
+        return squalificato;
+    }
+
+    /**
+     * Imposta il flag di squalifica ricevuto dal database durante la ricostruzione dell'entità.
+     */
+    public void setSqualificato(boolean squalificato) {
+        this.squalificato = squalificato;
+    }
+
+    /**
+     * Squalifica il team dall'hackathon.
+     * Chiamato dal service quando l'organizzatore accetta una segnalazione di violazione.
+     */
+    public void squalifica() {
+        this.squalificato = true;
     }
 }
