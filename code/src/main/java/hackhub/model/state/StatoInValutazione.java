@@ -21,6 +21,13 @@ public class StatoInValutazione implements HackathonState {
     }
 
     @Override
+    public void accettaRichiestaSupporto() {
+        throw new hackhub.exception.InvalidHackathonStateException(
+                "Impossibile inviare una richiesta di supporto: l'hackathon è in fase di valutazione."
+        );
+    }
+
+    @Override
     public StatoHackathon getNome() {
         return StatoHackathon.IN_VALUTAZIONE;
     }

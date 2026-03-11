@@ -14,8 +14,8 @@ public interface SegnalazioneObserver {
     /**
      * Invocato quando una nuova segnalazione di violazione è stata salvata.
      *
-     * @param segnalazione     la segnalazione appena persistita
-     * @param organizzatoreId  id dell'organizzatore dell'hackathon da notificare
+     * @param segnalazione    la segnalazione appena persistita
+     * @param organizzatoreId id dell'organizzatore dell'hackathon da notificare
      */
-    void onNuovaSegnalazione(Segnalazione segnalazione, UUID organizzatoreId);
+    public void onNuovaSegnalazione(Segnalazione segnalazione, UUID organizzatoreId);
 }

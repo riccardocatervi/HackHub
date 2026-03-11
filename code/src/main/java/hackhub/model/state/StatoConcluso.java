@@ -23,6 +23,13 @@ public class StatoConcluso implements HackathonState {
     }
 
     @Override
+    public void accettaRichiestaSupporto() {
+        throw new hackhub.exception.InvalidHackathonStateException(
+                "Impossibile inviare una richiesta di supporto: l'hackathon è già concluso."
+        );
+    }
+
+    @Override
     public StatoHackathon getNome() {
         return StatoHackathon.CONCLUSO;
     }

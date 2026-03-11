@@ -3,7 +3,8 @@ package hackhub.model.state;
 import hackhub.exception.IllegalStateTransitionException;
 
 /**
- * Stato IN_CORSO: l'hackathon è attivo. I team possono inviare le sottomissioni.
+ * Stato IN_CORSO: l'hackathon è attivo. I team possono inviare le sottomissioni
+ * e richiedere supporto ai mentori.
  * La proclamazione del vincitore non è ancora consentita.
  */
 public class StatoInCorso implements HackathonState {
@@ -18,6 +19,11 @@ public class StatoInCorso implements HackathonState {
         throw new IllegalStateTransitionException(
                 "Impossibile proclamare il vincitore: l'hackathon è ancora in corso."
         );
+    }
+
+    @Override
+    public void accettaRichiestaSupporto() {
+        // Operazione consentita in questo stato: nessuna azione richiesta.
     }
 
     @Override

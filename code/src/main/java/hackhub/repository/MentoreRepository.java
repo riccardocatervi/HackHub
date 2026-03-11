@@ -10,5 +10,5 @@ public interface MentoreRepository extends GenericRepository<Mentore, UUID> {
     /**
      * Restituisce tutti i mentori con disponibilità = true.
      */
-    List<Mentore> findAllDisponibili();
+    public List<Mentore> findAllDisponibili();
 }

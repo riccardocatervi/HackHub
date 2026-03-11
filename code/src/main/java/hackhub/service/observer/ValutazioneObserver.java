@@ -14,8 +14,8 @@ public interface ValutazioneObserver {
     /**
      * Invocato quando una valutazione è stata salvata con successo.
      *
-     * @param valutazione  la valutazione appena persistita
-     * @param idHackathon  id dell'hackathon di riferimento
+     * @param valutazione la valutazione appena persistita
+     * @param idHackathon id dell'hackathon di riferimento
      */
-    void onValutazioneCompletata(Valutazione valutazione, UUID idHackathon);
+    public void onValutazioneCompletata(Valutazione valutazione, UUID idHackathon);
 }

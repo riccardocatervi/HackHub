@@ -19,6 +19,12 @@ public interface HackathonState {
     void accettaProclamazione();
 
     /**
+     * Verifica che lo stato corrente consenta l'invio di una richiesta di supporto.
+     * Lancia InvalidHackathonStateException se l'operazione non è consentita.
+     */
+    void accettaRichiestaSupporto();
+
+    /**
      * Restituisce il valore enum corrispondente a questo stato (usato per la persistenza).
      */
     StatoHackathon getNome();

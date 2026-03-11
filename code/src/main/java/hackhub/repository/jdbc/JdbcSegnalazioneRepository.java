@@ -1,6 +1,8 @@
 package hackhub.repository.jdbc;
 
+import hackhub.exception.PersistenceException;
 import hackhub.infrastructure.db.DBConnection;
+import hackhub.model.StatoSegnalazione;
 import hackhub.model.entity.Segnalazione;
 import hackhub.repository.SegnalazioneRepository;
 
@@ -21,8 +23,8 @@ public class JdbcSegnalazioneRepository implements SegnalazioneRepository {
     @Override
     public void save(Segnalazione segnalazione) {
         String sql = """
-                INSERT INTO segnalazione (id_team, id_mentore, id_hackathon, descrizione, prove)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO segnalazione (id_team, id_mentore, id_hackathon, descrizione, prove, stato)
+                VALUES (?, ?, ?, ?, ?, ?::stato_segnalazione)
                 RETURNING id
                 """;
 
@@ -34,6 +36,7 @@ public class JdbcSegnalazioneRepository implements SegnalazioneRepository {
             stmt.setObject(3, segnalazione.getHackathonId());
             stmt.setString(4, segnalazione.getDescrizione());
             stmt.setString(5, segnalazione.getProve());
+            stmt.setString(6, segnalazione.getStato().name());
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -41,7 +44,7 @@ public class JdbcSegnalazioneRepository implements SegnalazioneRepository {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(
+            throw new PersistenceException(
                     "Errore durante il salvataggio della segnalazione: " + e.getMessage(), e);
         }
     }
@@ -62,7 +65,7 @@ public class JdbcSegnalazioneRepository implements SegnalazioneRepository {
             return Optional.empty();
 
         } catch (SQLException e) {
-            throw new RuntimeException(
+            throw new PersistenceException(
                     "Errore durante il recupero della segnalazione con id " + segnalazioneId + ": " + e.getMessage(), e);
         }
     }
@@ -84,12 +87,38 @@ public class JdbcSegnalazioneRepository implements SegnalazioneRepository {
             return risultato;
 
         } catch (SQLException e) {
-            throw new RuntimeException(
+            throw new PersistenceException(
                     "Errore durante il recupero delle segnalazioni per hackathon " + idHackathon + ": " + e.getMessage(), e);
         }
     }
 
+    @Override
+    public void updateStato(UUID idSegnalazione, StatoSegnalazione stato) {
+        String sql = "UPDATE segnalazione SET stato = ?::stato_segnalazione WHERE id = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, stato.name());
+            stmt.setObject(2, idSegnalazione);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new PersistenceException(
+                    "Errore durante l'aggiornamento dello stato della segnalazione " + idSegnalazione + ": " + e.getMessage(), e);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Mapping
+    // -------------------------------------------------------------------------
+
     private Segnalazione mapRow(ResultSet rs) throws SQLException {
+        String statoStr = rs.getString("stato");
+        StatoSegnalazione stato = (statoStr != null)
+                ? StatoSegnalazione.valueOf(statoStr)
+                : StatoSegnalazione.PENDENTE;
+
         return new Segnalazione(
                 (UUID) rs.getObject("id"),
                 (UUID) rs.getObject("id_team"),
@@ -97,7 +126,8 @@ public class JdbcSegnalazioneRepository implements SegnalazioneRepository {
                 (UUID) rs.getObject("id_hackathon"),
                 rs.getString("descrizione"),
                 rs.getString("prove"),
-                rs.getTimestamp("data_invio").toLocalDateTime()
+                rs.getTimestamp("data_invio").toLocalDateTime(),
+                stato
         );
     }
 }

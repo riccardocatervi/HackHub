@@ -171,6 +171,24 @@ public class JdbcHackathonRepository implements HackathonRepository {
         }
     }
 
+    @Override
+    public void updateVincitoreEPremio(UUID idHackathon, UUID idTeamVincitore, boolean premioDisbursed) {
+        String sql = "UPDATE hackathon SET id_team_vincitore = ?, premio_disbursed = ? WHERE id = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idTeamVincitore);
+            stmt.setBoolean(2, premioDisbursed);
+            stmt.setObject(3, idHackathon);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Errore durante l'aggiornamento del vincitore e del premio per l'hackathon " + idHackathon + ": " + e.getMessage(), e);
+        }
+    }
+
     private Hackathon mapRow(ResultSet rs) throws SQLException {
         UUID id = (UUID) rs.getObject("id");
         String via = rs.getString("via");
@@ -197,7 +215,7 @@ public class JdbcHackathonRepository implements HackathonRepository {
 
         StatoHackathon stato = StatoHackathon.valueOf(rs.getString("stato"));
 
-        return new Hackathon(
+        Hackathon hackathon = new Hackathon(
                 id,
                 rs.getString("nome"),
                 rs.getTimestamp("data_inizio").toLocalDateTime(),
@@ -213,5 +231,15 @@ public class JdbcHackathonRepository implements HackathonRepository {
                 idMentori,
                 stato.creaIstanza()
         );
+
+        // Ricostruzione dei campi aggiuntivi (opzionali, potrebbero non essere presenti)
+        try {
+            hackathon.setIdTeamVincitore((UUID) rs.getObject("id_team_vincitore"));
+            hackathon.setPremioDisbursed(rs.getBoolean("premio_disbursed"));
+        } catch (SQLException ignored) {
+            // Colonne non presenti in query parziali: si mantengono i valori di default
+        }
+
+        return hackathon;
     }
 }
