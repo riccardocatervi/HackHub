@@ -10,5 +10,5 @@ public interface GiudiceRepository extends GenericRepository<Giudice, UUID> {
     /**
      * Restituisce tutti i giudici con disponibilità = true.
      */
-    List<Giudice> findAllDisponibili();
+    public List<Giudice> findAllDisponibili();
 }

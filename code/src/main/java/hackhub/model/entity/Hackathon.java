@@ -31,8 +31,10 @@ public class Hackathon {
     private final String regolamento;
     private final UUID idOrganizzatore;
     private final UUID idGiudice;
-    private final List<UUID> idMentori;
+    private final List<UUID> idsMentori;
     private HackathonState stato;
+    private UUID idTeamVincitore;
+    private boolean premioDisbursed;
 
     /**
      * Costruttore per la creazione di un nuovo Hackathon.
@@ -61,7 +63,7 @@ public class Hackathon {
         this.regolamento = regolamento;
         this.idOrganizzatore = idOrganizzatore;
         this.idGiudice = idGiudice;
-        this.idMentori = idMentori;
+        this.idsMentori = idMentori;
         this.stato = new StatoInIscrizione();
     }
 
@@ -106,6 +108,14 @@ public class Hackathon {
      */
     public void verificaAccettaProclamazione() {
         stato.accettaProclamazione();
+    }
+
+    /**
+     * Verifica che lo stato corrente consenta l'invio di una richiesta di supporto.
+     * Lancia InvalidHackathonStateException se non consentito.
+     */
+    public void verificaAccettaRichiestaSupporto() {
+        stato.accettaRichiestaSupporto();
     }
 
     // -------------------------------------------------------------------------
@@ -200,8 +210,8 @@ public class Hackathon {
         return idGiudice;
     }
 
-    public List<UUID> getIdMentori() {
-        return idMentori;
+    public List<UUID> getIdsMentori() {
+        return idsMentori;
     }
 
     public HackathonState getStato() {
@@ -214,5 +224,27 @@ public class Hackathon {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public UUID getIdTeamVincitore() {
+        return idTeamVincitore;
+    }
+
+    /**
+     * Imposta l'id del team vincitore al momento della proclamazione ufficiale.
+     */
+    public void setIdTeamVincitore(UUID idTeamVincitore) {
+        this.idTeamVincitore = idTeamVincitore;
+    }
+
+    public boolean isPremioDisbursed() {
+        return premioDisbursed;
+    }
+
+    /**
+     * Aggiorna il flag di avvenuta erogazione del premio.
+     */
+    public void setPremioDisbursed(boolean premioDisbursed) {
+        this.premioDisbursed = premioDisbursed;
     }
 }

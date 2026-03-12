@@ -203,6 +203,56 @@ public class JdbcSottomissioneRepository implements SottomissioneRepository {
         }
     }
 
+    @Override
+    public Optional<Sottomissione> findByHackathonAndTeam(UUID idHackathon, UUID idTeam) {
+        String sql = "SELECT * FROM sottomissione WHERE id_hackathon = ? AND id_team = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idHackathon);
+            stmt.setObject(2, idTeam);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return Optional.of(mapRow(rs));
+            }
+            return Optional.empty();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Errore durante il recupero della sottomissione per hackathon " + idHackathon +
+                            " e team " + idTeam + ": " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void update(Sottomissione s) {
+        String sql = """
+                UPDATE sottomissione
+                   SET link_repo  = ?,
+                       link_demo  = ?,
+                       descrizione = ?,
+                       data_invio  = ?
+                 WHERE id = ?
+                """;
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, s.getLinkRepo());
+            stmt.setString(2, s.getLinkDemo());
+            stmt.setString(3, s.getDescrizione());
+            stmt.setTimestamp(4, Timestamp.valueOf(s.getDataInvio()));
+            stmt.setObject(5, s.getId());
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Errore durante l'aggiornamento della sottomissione con id " + s.getId() + ": " + e.getMessage(), e);
+        }
+    }
+
     private Sottomissione mapRow(ResultSet rs) throws SQLException {
         return new Sottomissione(
                 (UUID) rs.getObject("id"),

@@ -199,7 +199,7 @@ public class TeamService {
                         h.getPremio(), h.getLuogo(),
                         h.getDimensioneMaxTeam(), h.getRegolamento(),
                         h.getIdOrganizzatore(), h.getIdGiudice(),
-                        h.getIdMentori(), h.getStatoEnum()
+                        h.getIdsMentori(), h.getStatoEnum()
                 ))
                 .toList();
     }
@@ -223,8 +223,8 @@ public class TeamService {
         }
     }
 
-    private void verificaDisponibilitaInvitati(List<UUID> idInvitati, UUID idHackathon) {
-        for (UUID idUtente : idInvitati) {
+    private void verificaDisponibilitaInvitati(List<UUID> idsInvitati, UUID idHackathon) {
+        for (UUID idUtente : idsInvitati) {
             if (!userRepository.isUserAvailable(idUtente, idHackathon)) {
                 throw new UserAlreadyInTeamException(
                         "L'utente " + idUtente + " è già membro di un team per questo hackathon " +

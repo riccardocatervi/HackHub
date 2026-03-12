@@ -7,8 +7,9 @@ import java.util.UUID;
  * Utilizzato per popolare la lista di selezione nel form di creazione team.
  */
 public record UtenteDisponibileDTO(
-        UUID   id,
+        UUID id,
         String nome,
         String cognome,
         String email
-) {}
+) {
+}

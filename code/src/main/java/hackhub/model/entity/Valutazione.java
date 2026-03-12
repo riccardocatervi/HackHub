@@ -19,10 +19,10 @@ public class Valutazione {
      */
     public Valutazione(double punteggio, String giudizioScritto,
                        UUID idSottomissione, UUID idGiudice) {
-        this.punteggio        = punteggio;
-        this.giudizioScritto  = giudizioScritto;
-        this.idSottomissione  = idSottomissione;
-        this.idGiudice        = idGiudice;
+        this.punteggio = punteggio;
+        this.giudizioScritto = giudizioScritto;
+        this.idSottomissione = idSottomissione;
+        this.idGiudice = idGiudice;
     }
 
     /**

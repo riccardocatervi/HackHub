@@ -23,8 +23,8 @@ public class ValutazioneController {
      * Recupera la dashboard di valutazione per il giudice:
      * lista completa di sottomissioni con flag che indica se già valutate.
      *
-     * @param hackathonId  id dell'hackathon
-     * @param giudiceId    id del giudice autenticato
+     * @param hackathonId id dell'hackathon
+     * @param giudiceId   id del giudice autenticato
      * @return DTO con lista sottomissioni e stato di valutazione di ciascuna
      */
     public SottomissioniDaValutareDTO richiediSottomissioniDaValutare(UUID hackathonId, UUID giudiceId) {
@@ -35,7 +35,7 @@ public class ValutazioneController {
      * Riceve la valutazione inserita dal giudice e la persiste.
      * Dopo il salvataggio la sottomissione risulta valutata e non è rivalutabile.
      *
-     * @param request  punteggio e giudizio scritto del giudice
+     * @param request punteggio e giudizio scritto del giudice
      * @return DTO di conferma con i dati della valutazione salvata
      */
     public ValutazioneResponseDTO inviaValutazione(ValutazioneRequestDTO request) {

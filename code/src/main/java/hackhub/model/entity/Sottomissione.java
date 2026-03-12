@@ -6,10 +6,10 @@ import java.util.UUID;
 public class Sottomissione {
 
     private UUID id;
-    private final String linkRepo;
-    private final String linkDemo;
-    private final String descrizione;
-    private final LocalDateTime dataInvio;
+    private String linkRepo;
+    private String linkDemo;
+    private String descrizione;
+    private LocalDateTime dataInvio;
     private final UUID idTeam;
     private final UUID idHackathon;
     private boolean vincitore;
@@ -90,5 +90,22 @@ public class Sottomissione {
 
     public boolean isValutato() {
         return valutato;
+    }
+
+    /**
+     * Aggiorna i dettagli modificabili della sottomissione (GRASP Information Expert).
+     * Registra il timestamp dell'aggiornamento come nuova data di invio.
+     *
+     * @param linkRepo    nuovo link al repository
+     * @param linkDemo    nuovo link alla demo
+     * @param descrizione nuova descrizione del progetto
+     * @param timestamp   timestamp dell'aggiornamento
+     */
+    public void updateDetails(String linkRepo, String linkDemo,
+                              String descrizione, LocalDateTime timestamp) {
+        this.linkRepo = linkRepo;
+        this.linkDemo = linkDemo;
+        this.descrizione = descrizione;
+        this.dataInvio = timestamp;
     }
 }

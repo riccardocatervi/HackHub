@@ -20,5 +20,5 @@ public interface GenericRepository<T, ID> {
      * @param id l'identificatore dell'entità
      * @return Optional contenente l'entità se trovata, Optional.empty() altrimenti
      */
-    Optional<T> findById(ID id);
+    public Optional<T> findById(ID id);
 }

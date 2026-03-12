@@ -1,5 +1,6 @@
 package hackhub.repository.jdbc;
 
+import hackhub.exception.PersistenceException;
 import hackhub.infrastructure.db.DBConnection;
 import hackhub.model.entity.MembroTeam;
 import hackhub.model.entity.Team;
@@ -35,7 +36,7 @@ public class JdbcTeamRepository implements TeamRepository {
             return Optional.empty();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero del team con id " + id + ": " + e.getMessage(), e);
+            throw new PersistenceException("Errore durante il recupero del team con id " + id + ": " + e.getMessage(), e);
         }
     }
 
@@ -61,7 +62,7 @@ public class JdbcTeamRepository implements TeamRepository {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il salvataggio del team: " + e.getMessage(), e);
+            throw new PersistenceException("Errore durante il salvataggio del team: " + e.getMessage(), e);
         }
     }
 
@@ -87,7 +88,7 @@ public class JdbcTeamRepository implements TeamRepository {
             return Optional.empty();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la ricerca del team per membro: " + e.getMessage(), e);
+            throw new PersistenceException("Errore durante la ricerca del team per membro: " + e.getMessage(), e);
         }
     }
 
@@ -108,7 +109,7 @@ public class JdbcTeamRepository implements TeamRepository {
             return risultato;
 
         } catch (SQLException e) {
-            throw new RuntimeException(
+            throw new PersistenceException(
                     "Errore durante il recupero dei team per hackathon " + idHackathon + ": " + e.getMessage(), e);
         }
     }
@@ -125,7 +126,7 @@ public class JdbcTeamRepository implements TeamRepository {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException(
+            throw new PersistenceException(
                     "Errore durante l'aggiunta del membro al team " + idTeam + ": " + e.getMessage(), e);
         }
     }
@@ -159,17 +160,45 @@ public class JdbcTeamRepository implements TeamRepository {
             return membri;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero dei membri del team " + idTeam + ": " + e.getMessage(), e);
+            throw new PersistenceException("Errore durante il recupero dei membri del team " + idTeam + ": " + e.getMessage(), e);
         }
     }
 
+    @Override
+    public void updateSqualificato(UUID idTeam, boolean squalificato) {
+        String sql = "UPDATE team SET squalificato = ? WHERE id = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setBoolean(1, squalificato);
+            stmt.setObject(2, idTeam);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new PersistenceException(
+                    "Errore durante l'aggiornamento del flag squalificato per il team " + idTeam + ": " + e.getMessage(), e);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Mapping
+    // -------------------------------------------------------------------------
+
     private Team mapRow(ResultSet rs) throws SQLException {
-        return new Team(
+        Team team = new Team(
                 (UUID) rs.getObject("id"),
                 rs.getString("nome"),
                 rs.getString("descrizione"),
                 (UUID) rs.getObject("id_leader"),
                 (UUID) rs.getObject("id_hackathon")
         );
+        // Il flag squalificato viene letto se la colonna esiste nel result set
+        try {
+            team.setSqualificato(rs.getBoolean("squalificato"));
+        } catch (SQLException ignored) {
+            // La colonna potrebbe non essere presente in query parziali (JOIN senza SELECT *)
+        }
+        return team;
     }
 }

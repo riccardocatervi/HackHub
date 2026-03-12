@@ -12,6 +12,6 @@ public record TeamResponseDTO(
         String descrizione,
         UUID idLeader,
         UUID idHackathon,
-        List<UUID> idUtentiInvitati
+        List<UUID> idsUtentiInvitati
 ) {
 }

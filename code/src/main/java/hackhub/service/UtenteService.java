@@ -23,11 +23,11 @@ public class UtenteService {
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
-    private final UserRepository  userRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UtenteService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository  = userRepository;
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -79,7 +79,7 @@ public class UtenteService {
         if (userRepository.existsByEmail(dto.email())) {
             throw new EmailAlreadyExistsException(
                     "L'email " + dto.email() + " è già associata a un account locale. " +
-                    "Accedi con email e password oppure usa il recupero account.");
+                            "Accedi con email e password oppure usa il recupero account.");
         }
 
         Utente utente = new Utente(dto.nome(), dto.cognome(), dto.email(),
