@@ -9,13 +9,19 @@ import java.util.UUID;
 
 public interface InvitoRepository extends GenericRepository<Invito, UUID> {
 
-    /** Persiste un nuovo invito e imposta l'id generato dal DB sull'entità. */
+    /**
+     * Persiste un nuovo invito e imposta l'id generato dal DB sull'entità.
+     */
     public void save(Invito invito);
 
-    /** Restituisce tutti gli inviti (in qualsiasi stato) associati a un team. */
+    /**
+     * Restituisce tutti gli inviti (in qualsiasi stato) associati a un team.
+     */
     public List<Invito> findByTeam(UUID idTeam);
 
-    /** Restituisce gli inviti in uno stato specifico per un determinato team. */
+    /**
+     * Restituisce gli inviti in uno stato specifico per un determinato team.
+     */
     public List<Invito> findByTeamAndStato(UUID idTeam, StatoInvito stato);
 
     /**

@@ -44,16 +44,19 @@ import static org.mockito.Mockito.*;
 @DisplayName("AggiornamentoSottomissioneService — Aggiornare Sottomissione del Team")
 class AggiornamentoSottomissioneServiceTest {
 
-    @Mock private HackathonRepository    hackathonRepository;
-    @Mock private SottomissioneRepository sottomissioneRepository;
-    @Mock private TeamRepository         teamRepository;
+    @Mock
+    private HackathonRepository hackathonRepository;
+    @Mock
+    private SottomissioneRepository sottomissioneRepository;
+    @Mock
+    private TeamRepository teamRepository;
 
     private AggiornamentoSottomissioneService service;
 
-    private static final LocalDateTime BASE         = LocalDateTime.now();
-    private static final UUID          ID_HACKATHON = UUID.randomUUID();
-    private static final UUID          ID_TEAM      = UUID.randomUUID();
-    private static final UUID          ID_SOTTOMISSIONE = UUID.randomUUID();
+    private static final LocalDateTime BASE = LocalDateTime.now();
+    private static final UUID ID_HACKATHON = UUID.randomUUID();
+    private static final UUID ID_TEAM = UUID.randomUUID();
+    private static final UUID ID_SOTTOMISSIONE = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
@@ -90,10 +93,10 @@ class AggiornamentoSottomissioneServiceTest {
             // Then
             assertNotNull(response);
             assertEquals(ID_SOTTOMISSIONE, response.idSottomissione());
-            assertEquals(ID_HACKATHON,    response.idHackathon());
-            assertEquals(ID_TEAM,         response.idTeam());
+            assertEquals(ID_HACKATHON, response.idHackathon());
+            assertEquals(ID_TEAM, response.idTeam());
             assertEquals("https://github.com/nuovo/repo", response.linkRepo());
-            assertEquals("https://demo.nuovo.com",        response.linkDemo());
+            assertEquals("https://demo.nuovo.com", response.linkDemo());
             assertEquals("Nuova descrizione aggiornata.", response.descrizione());
             assertNotNull(response.dataAggiornamento());
             verify(sottomissioneRepository).update(any(Sottomissione.class));
@@ -119,7 +122,7 @@ class AggiornamentoSottomissioneServiceTest {
             verify(sottomissioneRepository).update(captor.capture());
             Sottomissione aggiornata = captor.getValue();
             assertEquals("https://github.com/nuovo/repo", aggiornata.getLinkRepo());
-            assertEquals("https://demo.nuovo.com",        aggiornata.getLinkDemo());
+            assertEquals("https://demo.nuovo.com", aggiornata.getLinkDemo());
             assertEquals("Nuova descrizione aggiornata.", aggiornata.getDescrizione());
         }
 
@@ -211,11 +214,11 @@ class AggiornamentoSottomissioneServiceTest {
                     service.getFormDataAggiornamento(ID_HACKATHON, ID_TEAM);
 
             assertNotNull(form);
-            assertEquals(ID_HACKATHON,     form.idHackathon());
-            assertEquals(ID_TEAM,          form.idTeam());
+            assertEquals(ID_HACKATHON, form.idHackathon());
+            assertEquals(ID_TEAM, form.idTeam());
             assertEquals(ID_SOTTOMISSIONE, form.idSottomissione());
             assertEquals("https://github.com/vecchio/repo", form.linkRepoAttuale());
-            assertEquals("https://demo.vecchio.com",        form.linkDemoAttuale());
+            assertEquals("https://demo.vecchio.com", form.linkDemoAttuale());
         }
 
         @Test
@@ -296,7 +299,7 @@ class AggiornamentoSottomissioneServiceTest {
         return new Hackathon(
                 ID_HACKATHON, "Hackathon Test",
                 BASE.plusDays(10), BASE.plusDays(20),
-                BASE.plusDays(5),  BASE.plusDays(15),
+                BASE.plusDays(5), BASE.plusDays(15),
                 1000.0, null, 5, "Regolamento",
                 UUID.randomUUID(), UUID.randomUUID(), List.of(),
                 stato

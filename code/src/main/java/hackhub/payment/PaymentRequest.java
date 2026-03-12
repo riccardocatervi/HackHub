@@ -17,9 +17,9 @@ public class PaymentRequest {
     public PaymentRequest(String emailDestinatario, double importo,
                           UUID idHackathon, UUID idTeam) {
         this.emailDestinatario = emailDestinatario;
-        this.importo           = importo;
-        this.idHackathon       = idHackathon;
-        this.idTeam            = idTeam;
+        this.importo = importo;
+        this.idHackathon = idHackathon;
+        this.idTeam = idTeam;
     }
 
     public String getEmailDestinatario() {

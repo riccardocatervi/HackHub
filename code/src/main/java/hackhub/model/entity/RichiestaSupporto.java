@@ -25,11 +25,11 @@ public class RichiestaSupporto {
                              UUID idHackathon,
                              UUID idMentore,
                              String motivo) {
-        this.idTeam      = idTeam;
+        this.idTeam = idTeam;
         this.idHackathon = idHackathon;
-        this.idMentore   = idMentore;
-        this.motivo      = motivo;
-        this.dataInvio   = LocalDateTime.now();
+        this.idMentore = idMentore;
+        this.motivo = motivo;
+        this.dataInvio = LocalDateTime.now();
     }
 
     /**
@@ -41,19 +41,39 @@ public class RichiestaSupporto {
                              UUID idMentore,
                              String motivo,
                              LocalDateTime dataInvio) {
-        this.id          = id;
-        this.idTeam      = idTeam;
+        this.id = id;
+        this.idTeam = idTeam;
         this.idHackathon = idHackathon;
-        this.idMentore   = idMentore;
-        this.motivo      = motivo;
-        this.dataInvio   = dataInvio;
+        this.idMentore = idMentore;
+        this.motivo = motivo;
+        this.dataInvio = dataInvio;
     }
 
-    public UUID getId()          { return id; }
-    public void setId(UUID id)   { this.id = id; }
-    public UUID getIdTeam()      { return idTeam; }
-    public UUID getIdHackathon() { return idHackathon; }
-    public UUID getIdMentore()   { return idMentore; }
-    public String getMotivo()    { return motivo; }
-    public LocalDateTime getDataInvio() { return dataInvio; }
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public UUID getIdTeam() {
+        return idTeam;
+    }
+
+    public UUID getIdHackathon() {
+        return idHackathon;
+    }
+
+    public UUID getIdMentore() {
+        return idMentore;
+    }
+
+    public String getMotivo() {
+        return motivo;
+    }
+
+    public LocalDateTime getDataInvio() {
+        return dataInvio;
+    }
 }

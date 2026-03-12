@@ -9,13 +9,19 @@ import java.util.UUID;
 
 public interface UserRepository extends GenericRepository<Utente, UUID> {
 
-    /** Cerca un utente per indirizzo email. */
+    /**
+     * Cerca un utente per indirizzo email.
+     */
     public Optional<Utente> findByEmail(String email);
 
-    /** Verifica se esiste già un utente con la stessa email. */
+    /**
+     * Verifica se esiste già un utente con la stessa email.
+     */
     public boolean existsByEmail(String email);
 
-    /** Cerca un utente tramite le credenziali OAuth2. */
+    /**
+     * Cerca un utente tramite le credenziali OAuth2.
+     */
     public Optional<Utente> findByOAuth(OAuthProvider provider, String externalId);
 
     /**
@@ -31,6 +37,8 @@ public interface UserRepository extends GenericRepository<Utente, UUID> {
      */
     public boolean isUserAvailable(UUID idUtente, UUID idHackathon);
 
-    /** Persiste un nuovo utente e imposta l'id generato dal DB sull'entità. */
+    /**
+     * Persiste un nuovo utente e imposta l'id generato dal DB sull'entità.
+     */
     public void salva(Utente utente);
 }

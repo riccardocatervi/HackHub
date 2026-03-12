@@ -14,4 +14,5 @@ public record SupportoResponseDTO(
         String nomeMentore,
         LocalDateTime dataInvio,
         String messaggio
-) { }
+) {
+}

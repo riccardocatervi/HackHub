@@ -12,4 +12,5 @@ public record SottomissioneUpdateDTO(
         String linkRepo,
         String linkDemo,
         String descrizione
-) { }
+) {
+}

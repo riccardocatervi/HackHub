@@ -29,7 +29,7 @@ public class SegnalazioneController {
      * Fornisce i dati necessari per il modulo di segnalazione:
      * nome hackathon e lista dei team che il mentore può segnalare.
      *
-     * @param hackathonId  id dell'hackathon visualizzato nella dashboard del mentore
+     * @param hackathonId id dell'hackathon visualizzato nella dashboard del mentore
      * @return DTO con i dati del form da mostrare al mentore
      */
     public ModuloSegnalazioneDTO getDatiModulo(UUID hackathonId) {
@@ -40,7 +40,7 @@ public class SegnalazioneController {
      * Riceve i dati compilati dal mentore e registra la segnalazione.
      * Notifica immediatamente l'organizzatore tramite il servizio notifiche (Observer).
      *
-     * @param request  dati del modulo compilato
+     * @param request dati del modulo compilato
      * @return DTO di conferma con messaggio di avvenuta segnalazione
      */
     public SegnalazioneResponseDTO inviaSegnalazione(SegnalazioneRequestDTO request) {
@@ -51,7 +51,7 @@ public class SegnalazioneController {
      * Restituisce i dettagli completi di una segnalazione selezionata dall'organizzatore
      * dalla lista delle segnalazioni dell'hackathon.
      *
-     * @param idSegnalazione  id della segnalazione da visualizzare
+     * @param idSegnalazione id della segnalazione da visualizzare
      * @return DTO con dettagli della segnalazione (mentore, team, descrizione, prove, stato)
      */
     public SegnalazioneDettagliDTO getDettagliSegnalazione(UUID idSegnalazione) {
@@ -63,7 +63,7 @@ public class SegnalazioneController {
      * Squalifica il team se la segnalazione viene accettata, o chiude il caso se rifiutata.
      * Notifica il mentore tramite il pattern Observer.
      *
-     * @param dto  DTO con l'id della segnalazione e la decisione (ACCETTATA o RIFIUTATA)
+     * @param dto DTO con l'id della segnalazione e la decisione (ACCETTATA o RIFIUTATA)
      * @return DTO di risposta con il risultato dell'operazione
      */
     public SegnalazioneGestioneResponseDTO gestisciSegnalazione(SegnalazioneGestioneDTO dto) {

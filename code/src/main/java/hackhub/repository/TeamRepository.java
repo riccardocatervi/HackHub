@@ -9,7 +9,9 @@ import java.util.UUID;
 
 public interface TeamRepository extends GenericRepository<Team, UUID> {
 
-    /** Persiste un nuovo team e imposta l'id generato dal DB sull'entità. */
+    /**
+     * Persiste un nuovo team e imposta l'id generato dal DB sull'entità.
+     */
     public void save(Team team);
 
     /**

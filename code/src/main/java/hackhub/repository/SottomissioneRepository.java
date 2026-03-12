@@ -8,10 +8,14 @@ import java.util.UUID;
 
 public interface SottomissioneRepository extends GenericRepository<Sottomissione, UUID> {
 
-    /** Persiste una nuova sottomissione e imposta l'id generato dal DB sull'entità passata. */
+    /**
+     * Persiste una nuova sottomissione e imposta l'id generato dal DB sull'entità passata.
+     */
     public void save(Sottomissione sottomissione);
 
-    /** Verifica se il team ha già inviato una sottomissione per l'hackathon specificato. */
+    /**
+     * Verifica se il team ha già inviato una sottomissione per l'hackathon specificato.
+     */
     public boolean existsByHackathonAndTeam(UUID idHackathon, UUID idTeam);
 
     /**
@@ -26,13 +30,19 @@ public interface SottomissioneRepository extends GenericRepository<Sottomissione
      */
     public Optional<Sottomissione> findVincitore(UUID idHackathon);
 
-    /** Imposta il flag vincitore = true sulla sottomissione specificata. */
+    /**
+     * Imposta il flag vincitore = true sulla sottomissione specificata.
+     */
     public void markAsVincitore(UUID idSottomissione);
 
-    /** Imposta il flag valutato = true sulla sottomissione specificata. */
+    /**
+     * Imposta il flag valutato = true sulla sottomissione specificata.
+     */
     public void markAsValutata(UUID idSottomissione);
 
-    /** Restituisce le sottomissioni ancora da valutare per un hackathon. */
+    /**
+     * Restituisce le sottomissioni ancora da valutare per un hackathon.
+     */
     public List<Sottomissione> findSottomissioniDaValutare(UUID idHackathon, UUID idGiudice);
 
     /**

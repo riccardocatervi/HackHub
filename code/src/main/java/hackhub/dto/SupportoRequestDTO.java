@@ -10,4 +10,5 @@ public record SupportoRequestDTO(
         UUID idHackathon,
         UUID idTeam,
         String motivo
-) { }
+) {
+}

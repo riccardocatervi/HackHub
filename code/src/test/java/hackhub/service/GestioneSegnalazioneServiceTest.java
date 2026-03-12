@@ -40,18 +40,22 @@ import static org.mockito.Mockito.*;
 @DisplayName("SegnalazioneService — Gestire penalizzazione o squalifica di un team")
 class GestioneSegnalazioneServiceTest {
 
-    @Mock private SegnalazioneRepository segnalazioneRepository;
-    @Mock private TeamRepository         teamRepository;
-    @Mock private HackathonRepository    hackathonRepository;
-    @Mock private MentoreRepository      mentoreRepository;
+    @Mock
+    private SegnalazioneRepository segnalazioneRepository;
+    @Mock
+    private TeamRepository teamRepository;
+    @Mock
+    private HackathonRepository hackathonRepository;
+    @Mock
+    private MentoreRepository mentoreRepository;
 
     private SegnalazioneService segnalazioneService;
 
-    private static final UUID ID_SEGNALAZIONE  = UUID.randomUUID();
-    private static final UUID ID_TEAM          = UUID.randomUUID();
-    private static final UUID ID_MENTORE       = UUID.randomUUID();
-    private static final UUID ID_HACKATHON     = UUID.randomUUID();
-    private static final LocalDateTime DATA    = LocalDateTime.now().minusHours(2);
+    private static final UUID ID_SEGNALAZIONE = UUID.randomUUID();
+    private static final UUID ID_TEAM = UUID.randomUUID();
+    private static final UUID ID_MENTORE = UUID.randomUUID();
+    private static final UUID ID_HACKATHON = UUID.randomUUID();
+    private static final LocalDateTime DATA = LocalDateTime.now().minusHours(2);
 
     @BeforeEach
     void setUp() {

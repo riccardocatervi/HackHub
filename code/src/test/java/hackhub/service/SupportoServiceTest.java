@@ -48,18 +48,23 @@ import static org.mockito.Mockito.*;
 @DisplayName("SupportoService — Inviare Richiesta di Supporto a un Mentore")
 class SupportoServiceTest {
 
-    @Mock private HackathonRepository         hackathonRepository;
-    @Mock private TeamRepository              teamRepository;
-    @Mock private MentoreRepository           mentoreRepository;
-    @Mock private RichiestaSupportoRepository richiestaSupportoRepository;
-    @Mock private RichiestaSupportoObserver   observer;
+    @Mock
+    private HackathonRepository hackathonRepository;
+    @Mock
+    private TeamRepository teamRepository;
+    @Mock
+    private MentoreRepository mentoreRepository;
+    @Mock
+    private RichiestaSupportoRepository richiestaSupportoRepository;
+    @Mock
+    private RichiestaSupportoObserver observer;
 
     private SupportoService service;
 
-    private static final LocalDateTime BASE         = LocalDateTime.now();
-    private static final UUID          ID_HACKATHON = UUID.randomUUID();
-    private static final UUID          ID_TEAM      = UUID.randomUUID();
-    private static final UUID          ID_MENTORE   = UUID.randomUUID();
+    private static final LocalDateTime BASE = LocalDateTime.now();
+    private static final UUID ID_HACKATHON = UUID.randomUUID();
+    private static final UUID ID_TEAM = UUID.randomUUID();
+    private static final UUID ID_MENTORE = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
@@ -130,9 +135,9 @@ class SupportoServiceTest {
             ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
             verify(observer).onNuovaRichiestaSupporto(richiestaCaptor.capture(), emailCaptor.capture());
 
-            assertEquals(ID_TEAM,      richiestaCaptor.getValue().getIdTeam());
+            assertEquals(ID_TEAM, richiestaCaptor.getValue().getIdTeam());
             assertEquals(ID_HACKATHON, richiestaCaptor.getValue().getIdHackathon());
-            assertEquals(ID_MENTORE,   richiestaCaptor.getValue().getIdMentore());
+            assertEquals(ID_MENTORE, richiestaCaptor.getValue().getIdMentore());
             assertEquals("mario.rossi@example.com", emailCaptor.getValue());
         }
 
@@ -229,8 +234,8 @@ class SupportoServiceTest {
 
             assertNotNull(form);
             assertEquals(ID_HACKATHON, form.idHackathon());
-            assertEquals(ID_TEAM,      form.idTeam());
-            assertEquals("Team Alfa",  form.nomeTeam());
+            assertEquals(ID_TEAM, form.idTeam());
+            assertEquals("Team Alfa", form.nomeTeam());
         }
 
         @Test
@@ -285,7 +290,7 @@ class SupportoServiceTest {
         return new Hackathon(
                 ID_HACKATHON, "Hackathon Test",
                 BASE.plusDays(10), BASE.plusDays(20),
-                BASE.plusDays(5),  BASE.plusDays(15),
+                BASE.plusDays(5), BASE.plusDays(15),
                 1000.0, null, 5, "Regolamento",
                 UUID.randomUUID(), UUID.randomUUID(),
                 List.of(idMentore),
@@ -297,7 +302,7 @@ class SupportoServiceTest {
         return new Hackathon(
                 ID_HACKATHON, "Hackathon Test",
                 BASE.plusDays(10), BASE.plusDays(20),
-                BASE.plusDays(5),  BASE.plusDays(15),
+                BASE.plusDays(5), BASE.plusDays(15),
                 1000.0, null, 5, "Regolamento",
                 UUID.randomUUID(), UUID.randomUUID(),
                 List.of(),

@@ -103,9 +103,9 @@ public class Sottomissione {
      */
     public void updateDetails(String linkRepo, String linkDemo,
                               String descrizione, LocalDateTime timestamp) {
-        this.linkRepo    = linkRepo;
-        this.linkDemo    = linkDemo;
+        this.linkRepo = linkRepo;
+        this.linkDemo = linkDemo;
         this.descrizione = descrizione;
-        this.dataInvio   = timestamp;
+        this.dataInvio = timestamp;
     }
 }

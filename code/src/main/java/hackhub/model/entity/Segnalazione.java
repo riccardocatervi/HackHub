@@ -29,13 +29,13 @@ public class Segnalazione {
      */
     public Segnalazione(UUID teamId, UUID mentoreId, UUID hackathonId,
                         String descrizione, String prove) {
-        this.teamId      = teamId;
-        this.mentoreId   = mentoreId;
+        this.teamId = teamId;
+        this.mentoreId = mentoreId;
         this.hackathonId = hackathonId;
         this.descrizione = descrizione;
-        this.prove       = prove;
-        this.dataInvio   = LocalDateTime.now();
-        this.stato       = StatoSegnalazione.PENDENTE;
+        this.prove = prove;
+        this.dataInvio = LocalDateTime.now();
+        this.stato = StatoSegnalazione.PENDENTE;
     }
 
     /**
@@ -56,8 +56,8 @@ public class Segnalazione {
                         String descrizione, String prove, LocalDateTime dataInvio,
                         StatoSegnalazione stato) {
         this(teamId, mentoreId, hackathonId, descrizione, prove);
-        this.id     = id;
-        this.stato  = stato;
+        this.id = id;
+        this.stato = stato;
     }
 
     public UUID getId() {

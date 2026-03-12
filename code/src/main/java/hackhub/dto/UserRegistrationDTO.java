@@ -8,4 +8,5 @@ public record UserRegistrationDTO(
         String cognome,
         String email,
         String password
-) {}
+) {
+}

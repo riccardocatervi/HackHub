@@ -9,8 +9,8 @@ import java.util.UUID;
  * Il campo {@code azione} deve essere ACCETTATA (squalifica il team)
  * oppure RIFIUTATA (prove insufficienti).
  *
- * @param idSegnalazione  id della segnalazione da gestire
- * @param azione          decisione dell'organizzatore: ACCETTATA o RIFIUTATA
+ * @param idSegnalazione id della segnalazione da gestire
+ * @param azione         decisione dell'organizzatore: ACCETTATA o RIFIUTATA
  */
 public record SegnalazioneGestioneDTO(
         UUID idSegnalazione,

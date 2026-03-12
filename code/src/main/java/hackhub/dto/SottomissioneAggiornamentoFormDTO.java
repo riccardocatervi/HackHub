@@ -16,4 +16,5 @@ public record SottomissioneAggiornamentoFormDTO(
         String linkRepoAttuale,
         String linkDemoAttuale,
         String descrizioneAttuale
-) { }
+) {
+}

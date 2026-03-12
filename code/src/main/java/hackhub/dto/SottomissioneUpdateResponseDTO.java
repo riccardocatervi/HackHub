@@ -15,4 +15,5 @@ public record SottomissioneUpdateResponseDTO(
         String linkDemo,
         String descrizione,
         LocalDateTime dataAggiornamento
-) { }
+) {
+}

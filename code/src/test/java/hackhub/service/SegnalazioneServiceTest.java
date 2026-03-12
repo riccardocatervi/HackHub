@@ -39,17 +39,20 @@ import static org.mockito.Mockito.*;
 @DisplayName("SegnalazioneService — Segnalare violazione del regolamento")
 class SegnalazioneServiceTest {
 
-    @Mock private SegnalazioneRepository segnalazioneRepository;
-    @Mock private TeamRepository         teamRepository;
-    @Mock private HackathonRepository    hackathonRepository;
+    @Mock
+    private SegnalazioneRepository segnalazioneRepository;
+    @Mock
+    private TeamRepository teamRepository;
+    @Mock
+    private HackathonRepository hackathonRepository;
 
     private SegnalazioneService segnalazioneService;
 
-    private static final LocalDateTime BASE        = LocalDateTime.now();
-    private static final UUID ID_HACKATHON         = UUID.randomUUID();
-    private static final UUID ID_MENTORE           = UUID.randomUUID();
-    private static final UUID ID_TEAM              = UUID.randomUUID();
-    private static final UUID ID_ORGANIZZATORE     = UUID.randomUUID();
+    private static final LocalDateTime BASE = LocalDateTime.now();
+    private static final UUID ID_HACKATHON = UUID.randomUUID();
+    private static final UUID ID_MENTORE = UUID.randomUUID();
+    private static final UUID ID_TEAM = UUID.randomUUID();
+    private static final UUID ID_ORGANIZZATORE = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {

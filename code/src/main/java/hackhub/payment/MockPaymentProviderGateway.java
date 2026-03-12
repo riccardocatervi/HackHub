@@ -28,7 +28,7 @@ public class MockPaymentProviderGateway implements PaymentProviderGateway {
 
         LOG.info(String.format(
                 "[MOCK PAYMENT] Transazione simulata — id: %s | destinatario: %s | " +
-                "importo: €%.2f | hackathon: %s | team: %s | timestamp: %s",
+                        "importo: €%.2f | hackathon: %s | team: %s | timestamp: %s",
                 transactionId,
                 request.getEmailDestinatario(),
                 request.getImporto(),

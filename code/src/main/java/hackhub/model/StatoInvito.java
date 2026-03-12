@@ -5,12 +5,18 @@ package hackhub.model;
  */
 public enum StatoInvito {
 
-    /** Invito inviato, in attesa di risposta da parte dell'utente invitato. */
+    /**
+     * Invito inviato, in attesa di risposta da parte dell'utente invitato.
+     */
     IN_ATTESA,
 
-    /** Invito accettato: l'utente è stato aggiunto come membro del team. */
+    /**
+     * Invito accettato: l'utente è stato aggiunto come membro del team.
+     */
     ACCETTATO,
 
-    /** Invito rifiutato: l'utente non è membro del team. */
+    /**
+     * Invito rifiutato: l'utente non è membro del team.
+     */
     RIFIUTATO
 }

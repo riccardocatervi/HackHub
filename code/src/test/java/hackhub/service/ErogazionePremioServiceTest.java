@@ -39,22 +39,28 @@ import static org.mockito.Mockito.*;
 @DisplayName("ProclamazioneService — Erogare premio al team vincitore")
 class ErogazionePremioServiceTest {
 
-    @Mock private HackathonRepository     hackathonRepository;
-    @Mock private SottomissioneRepository sottomissioneRepository;
-    @Mock private TeamRepository          teamRepository;
-    @Mock private NotificationsService    notificationsService;
-    @Mock private PaymentService          paymentService;
-    @Mock private UserRepository          userRepository;
+    @Mock
+    private HackathonRepository hackathonRepository;
+    @Mock
+    private SottomissioneRepository sottomissioneRepository;
+    @Mock
+    private TeamRepository teamRepository;
+    @Mock
+    private NotificationsService notificationsService;
+    @Mock
+    private PaymentService paymentService;
+    @Mock
+    private UserRepository userRepository;
 
     private ProclamazioneService proclamazioneService;
 
-    private static final LocalDateTime BASE       = LocalDateTime.now();
-    private static final UUID ID_HACKATHON        = UUID.randomUUID();
-    private static final UUID ID_TEAM             = UUID.randomUUID();
-    private static final UUID ID_SOTTOMISS        = UUID.randomUUID();
-    private static final UUID ID_LEADER           = UUID.randomUUID();
-    private static final double PREMIO            = 3000.0;
-    private static final String EMAIL_LEADER      = "leader@team.it";
+    private static final LocalDateTime BASE = LocalDateTime.now();
+    private static final UUID ID_HACKATHON = UUID.randomUUID();
+    private static final UUID ID_TEAM = UUID.randomUUID();
+    private static final UUID ID_SOTTOMISS = UUID.randomUUID();
+    private static final UUID ID_LEADER = UUID.randomUUID();
+    private static final double PREMIO = 3000.0;
+    private static final String EMAIL_LEADER = "leader@team.it";
 
     @BeforeEach
     void setUp() {

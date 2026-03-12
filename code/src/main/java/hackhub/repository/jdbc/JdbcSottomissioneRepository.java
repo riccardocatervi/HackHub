@@ -222,7 +222,7 @@ public class JdbcSottomissioneRepository implements SottomissioneRepository {
         } catch (SQLException e) {
             throw new RuntimeException(
                     "Errore durante il recupero della sottomissione per hackathon " + idHackathon +
-                    " e team " + idTeam + ": " + e.getMessage(), e);
+                            " e team " + idTeam + ": " + e.getMessage(), e);
         }
     }
 

@@ -42,18 +42,22 @@ import static org.mockito.Mockito.*;
 @DisplayName("ValutazioneService — Valutare sottomissione di un team")
 class ValutazioneServiceTest {
 
-    @Mock private ValutazioneRepository   valutazioneRepository;
-    @Mock private SottomissioneRepository sottomissioneRepository;
-    @Mock private HackathonRepository     hackathonRepository;
-    @Mock private TeamRepository          teamRepository;
+    @Mock
+    private ValutazioneRepository valutazioneRepository;
+    @Mock
+    private SottomissioneRepository sottomissioneRepository;
+    @Mock
+    private HackathonRepository hackathonRepository;
+    @Mock
+    private TeamRepository teamRepository;
 
     private ValutazioneService valutazioneService;
 
-    private static final LocalDateTime BASE        = LocalDateTime.now();
-    private static final UUID ID_HACKATHON         = UUID.randomUUID();
-    private static final UUID ID_GIUDICE           = UUID.randomUUID();
-    private static final UUID ID_SOTTOMISSIONE     = UUID.randomUUID();
-    private static final UUID ID_TEAM              = UUID.randomUUID();
+    private static final LocalDateTime BASE = LocalDateTime.now();
+    private static final UUID ID_HACKATHON = UUID.randomUUID();
+    private static final UUID ID_GIUDICE = UUID.randomUUID();
+    private static final UUID ID_SOTTOMISSIONE = UUID.randomUUID();
+    private static final UUID ID_TEAM = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
