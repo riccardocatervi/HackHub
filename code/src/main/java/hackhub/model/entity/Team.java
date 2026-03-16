@@ -75,4 +75,17 @@ public class Team {
     public void squalifica() {
         this.squalificato = true;
     }
+
+    /**
+     * Rimuove un membro dalla lista in memoria.
+     * Agisce come Information Expert: conosce la propria composizione.
+     * La rimozione persistente è delegata al repository.
+     *
+     * @param idMembro l'id dell'utente da rimuovere
+     */
+    public void rimuoviMembro(UUID idMembro) {
+        if (this.membri != null) {
+            this.membri.removeIf(m -> m.getId().equals(idMembro));
+        }
+    }
 }

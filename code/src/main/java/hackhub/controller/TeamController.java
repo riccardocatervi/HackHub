@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Coordinatore GRASP per il caso d'uso "Creare team per un hackathon".
+ * Coordinatore GRASP per i casi d'uso relativi alla gestione dei team:
+ * creazione, risposta agli inviti e gestione della partecipazione (abbandono).
  * Delega tutta la logica di dominio a {@link TeamService}.
  */
 public class TeamController {
@@ -58,7 +59,34 @@ public class TeamController {
      * @param dto DTO con id invito, id utente e risposta (accettato/rifiutato)
      * @return DTO con lo stato aggiornato dell'invito
      */
-    public InvitoResponseDTO rispondiInvito(RispostaInvitoDTO dto) {
+    public InvitationResponseDTO rispondiInvito(RispostaInvitoDTO dto) {
         return teamService.rispondiInvito(dto);
+    }
+
+    // -----------------------------------------------------------------------
+    // Caso d'uso: Gestire iscrizione al team (UC2)
+    // -----------------------------------------------------------------------
+
+    /**
+     * Recupera i dettagli di partecipazione corrente di un membro al suo team.
+     * Punto di ingresso del caso d'uso "Gestire iscrizione al team".
+     *
+     * @param idMembro id dell'utente autenticato
+     * @return DTO con team, hackathon, membri e flag di ruolo
+     */
+    public DettagliPartecipazioneDTO richiediDettagliPartecipazione(UUID idMembro) {
+        return teamService.ottieniDettagliTeamPerMembro(idMembro);
+    }
+
+    /**
+     * Processa la richiesta confermata di abbandono del team.
+     * Se il membro è leader, viene eletto un nuovo leader casuale.
+     *
+     * @param idTeam   id del team da abbandonare
+     * @param idMembro id dell'utente che abbandona
+     * @return DTO di conferma con messaggio esplicativo
+     */
+    public GestioneTeamResponseDTO confermaAbbandonoTeam(UUID idTeam, UUID idMembro) {
+        return teamService.abbandonaTeam(idTeam, idMembro);
     }
 }

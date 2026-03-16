@@ -1,5 +1,6 @@
 package hackhub.repository.jdbc;
 
+import hackhub.exception.PersistenceException;
 import hackhub.infrastructure.db.DBConnection;
 import hackhub.model.StatoInvito;
 import hackhub.model.entity.Invito;
@@ -159,6 +160,48 @@ public class JdbcInvitoRepository implements InvitoRepository {
 
         } catch (SQLException e) {
             throw new RuntimeException("Errore durante il conteggio degli inviti accettati: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<Invito> findPendingByUtente(UUID idUtente) {
+        String sql = """
+                SELECT * FROM invito
+                WHERE id_utente = ? AND stato = 'IN_ATTESA'
+                ORDER BY data_invio DESC
+                """;
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idUtente);
+            ResultSet rs = stmt.executeQuery();
+
+            List<Invito> inviti = new ArrayList<>();
+            while (rs.next()) {
+                inviti.add(mapRow(rs));
+            }
+            return inviti;
+
+        } catch (SQLException e) {
+            throw new PersistenceException(
+                    "Errore durante il recupero degli inviti pendenti per l'utente " + idUtente + ": " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void deleteByTeam(UUID idTeam) {
+        String sql = "DELETE FROM invito WHERE id_team = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idTeam);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new PersistenceException(
+                    "Errore durante l'eliminazione degli inviti del team " + idTeam + ": " + e.getMessage(), e);
         }
     }
 

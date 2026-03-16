@@ -1,6 +1,6 @@
 package hackhub.service;
 
-import hackhub.dto.PaymentSuccessDTO;
+import hackhub.dto.TransactionReceiptDTO;
 import hackhub.dto.ProclamazioneResponseDTO;
 import hackhub.exception.EntityNotFoundException;
 import hackhub.model.entity.Hackathon;
@@ -91,7 +91,7 @@ class ErogazionePremioServiceTest {
             stubTeamVincitore();
             stubLeader();
 
-            PaymentSuccessDTO receipt = new PaymentSuccessDTO(
+            TransactionReceiptDTO receipt = new TransactionReceiptDTO(
                     UUID.randomUUID(), EMAIL_LEADER, PREMIO, LocalDateTime.now()
             );
             when(paymentService.disbursePrize(eq(EMAIL_LEADER), eq(PREMIO), eq(ID_HACKATHON), eq(ID_TEAM)))
@@ -186,7 +186,7 @@ class ErogazionePremioServiceTest {
     class PaymentServiceTest {
 
         @Test
-        @DisplayName("Gateway risponde con ricevuta → restituisce PaymentSuccessDTO corretto")
+        @DisplayName("Gateway risponde con ricevuta → restituisce TransactionReceiptDTO corretto")
         void gatewaySuccesso_restituisceDTO() {
             // Usiamo il MockPaymentProviderGateway reale (non un mock) per testare l'integrazione
             hackhub.payment.MockPaymentProviderGateway mockGateway =
@@ -194,7 +194,7 @@ class ErogazionePremioServiceTest {
             PaymentService realPaymentService = new PaymentService(mockGateway);
 
             // When
-            PaymentSuccessDTO dto = realPaymentService.disbursePrize(
+            TransactionReceiptDTO dto = realPaymentService.disbursePrize(
                     "winner@test.it", 1500.0, UUID.randomUUID(), UUID.randomUUID()
             );
 

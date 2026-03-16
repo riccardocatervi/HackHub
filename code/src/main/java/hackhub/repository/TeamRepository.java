@@ -42,4 +42,29 @@ public interface TeamRepository extends GenericRepository<Team, UUID> {
      * Chiamato dal service quando l'organizzatore accetta una segnalazione di violazione.
      */
     public void updateSqualificato(UUID idTeam, boolean squalificato);
+
+    /**
+     * Trova il team (se esiste) di cui un utente è membro accettato,
+     * indipendentemente dall'hackathon. Restituisce il più recente in caso di più risultati.
+     * Utilizzato per recuperare i dettagli di partecipazione corrente di un membro.
+     */
+    public Optional<Team> findByMembro(UUID idMembro);
+
+    /**
+     * Rimuove l'associazione tra un utente e un team (abbandono del team).
+     * Opera sulla tabella membro_team.
+     */
+    public void removeMembro(UUID idTeam, UUID idMembro);
+
+    /**
+     * Aggiorna il leader di un team nel database.
+     * Chiamato quando il leader corrente abbandona il team e viene eletto un nuovo leader.
+     */
+    public void updateLeader(UUID idTeam, UUID nuovoLeaderId);
+
+    /**
+     * Elimina definitivamente un team e tutte le sue associazioni di membri.
+     * Chiamato durante la disiscrizione del team dall'hackathon.
+     */
+    public void delete(Team team);
 }
