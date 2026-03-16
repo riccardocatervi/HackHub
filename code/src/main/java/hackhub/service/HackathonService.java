@@ -1,10 +1,9 @@
 package hackhub.service;
 
-import hackhub.dto.GiudiceDTO;
 import hackhub.dto.HackathonFormDataDTO;
 import hackhub.dto.HackathonResponseDTO;
 import hackhub.dto.HackathonSubmissionDTO;
-import hackhub.dto.MentoreDTO;
+import hackhub.dto.PersonaDTO;
 import hackhub.exception.HackathonNotFoundException;
 import hackhub.model.entity.Giudice;
 import hackhub.model.entity.Hackathon;
@@ -51,12 +50,12 @@ public class HackathonService {
         Organizzatore organizzatore = organizzatoreRepository.findById(idOrganizzatore)
                 .orElseThrow(() -> new RuntimeException("Organizzatore non trovato: " + idOrganizzatore));
 
-        List<GiudiceDTO> giudici = giudiceRepository.findAllDisponibili().stream()
-                .map(g -> new GiudiceDTO(g.getId(), g.getNome(), g.getCognome()))
+        List<PersonaDTO> giudici = giudiceRepository.findAllDisponibili().stream()
+                .map(g -> new PersonaDTO(g.getId(), g.getNome(), g.getCognome()))
                 .collect(Collectors.toList());
 
-        List<MentoreDTO> mentori = mentoreRepository.findAllDisponibili().stream()
-                .map(m -> new MentoreDTO(m.getId(), m.getNome(), m.getCognome()))
+        List<PersonaDTO> mentori = mentoreRepository.findAllDisponibili().stream()
+                .map(m -> new PersonaDTO(m.getId(), m.getNome(), m.getCognome()))
                 .collect(Collectors.toList());
 
         String nomeOrganizzatore = organizzatore.getNome() + " " + organizzatore.getCognome();

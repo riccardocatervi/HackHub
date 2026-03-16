@@ -7,7 +7,7 @@ import java.util.List;
  */
 public record HackathonFormDataDTO(
         String nomeOrganizzatore,
-        List<GiudiceDTO> giudiciDisponibili,
-        List<MentoreDTO> mentoriDisponibili
+        List<PersonaDTO> giudiciDisponibili,
+        List<PersonaDTO> mentoriDisponibili
 ) {
 }

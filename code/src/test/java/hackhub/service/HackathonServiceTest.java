@@ -1,6 +1,6 @@
 package hackhub.service;
 
-import hackhub.dto.GiudiceDTO;
+import hackhub.dto.PersonaDTO;
 import hackhub.dto.HackathonFormDataDTO;
 import hackhub.dto.HackathonResponseDTO;
 import hackhub.dto.HackathonSubmissionDTO;
@@ -229,7 +229,7 @@ class HackathonServiceTest {
             assertEquals("Luca Verdi", form.nomeOrganizzatore());
             assertEquals(1, form.giudiciDisponibili().size());
             assertEquals(1, form.mentoriDisponibili().size());
-            GiudiceDTO giudiceDto = form.giudiciDisponibili().get(0);
+            PersonaDTO giudiceDto = form.giudiciDisponibili().get(0);
             assertEquals("Sara", giudiceDto.nome());
         }
 

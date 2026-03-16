@@ -3,11 +3,14 @@ package hackhub.service;
 import hackhub.model.StatoSegnalazione;
 import hackhub.model.entity.Hackathon;
 import hackhub.model.entity.Invito;
+import hackhub.model.entity.MembroTeam;
 import hackhub.model.entity.RichiestaSupporto;
 import hackhub.model.entity.Segnalazione;
 import hackhub.model.entity.Team;
 import hackhub.model.entity.Valutazione;
+import hackhub.service.observer.GestioneRichiestaSupportoObserver;
 import hackhub.service.observer.GestioneSegnalazioneObserver;
+import hackhub.service.observer.InvitationObserver;
 import hackhub.service.observer.RichiestaSupportoObserver;
 import hackhub.service.observer.SegnalazioneObserver;
 import hackhub.service.observer.ValutazioneObserver;
@@ -30,7 +33,8 @@ import java.util.logging.Logger;
  * Progettato per essere esteso con email/push nelle iterazioni successive.
  */
 public class NotificationsService implements SegnalazioneObserver, ValutazioneObserver,
-        GestioneSegnalazioneObserver, RichiestaSupportoObserver {
+        GestioneSegnalazioneObserver, RichiestaSupportoObserver, InvitationObserver,
+        GestioneRichiestaSupportoObserver {
 
     private static final Logger LOG = Logger.getLogger(NotificationsService.class.getName());
 
@@ -184,5 +188,143 @@ public class NotificationsService implements SegnalazioneObserver, ValutazioneOb
                 idSegnalazione,
                 esito
         ));
+    }
+
+    /**
+     * Notifica il creatore del team che un utente ha accettato il suo invito.
+     * Implementazione di {@link InvitationObserver}.
+     */
+    @Override
+    public void onInvitoAccettato(Invito invito, UUID idCreatore, String nomeInvitato) {
+        LOG.info(String.format(
+                "Notifica leader (id: %s): l'utente '%s' ha ACCETTATO l'invito (id: %s) " +
+                        "a unirsi al team %s per l'hackathon %s.",
+                idCreatore,
+                nomeInvitato,
+                invito.getId(),
+                invito.getIdTeam(),
+                invito.getIdHackathon()
+        ));
+    }
+
+    /**
+     * Notifica il creatore del team che un utente ha rifiutato il suo invito.
+     * Implementazione di {@link InvitationObserver}.
+     */
+    @Override
+    public void onInvitoRifiutato(Invito invito, UUID idCreatore, String nomeInvitato) {
+        LOG.info(String.format(
+                "Notifica leader (id: %s): l'utente '%s' ha RIFIUTATO l'invito (id: %s) " +
+                        "a unirsi al team %s per l'hackathon %s.",
+                idCreatore,
+                nomeInvitato,
+                invito.getId(),
+                invito.getIdTeam(),
+                invito.getIdHackathon()
+        ));
+    }
+
+    /**
+     * Notifica il nuovo leader e i restanti membri del cambio di leadership.
+     * Chiamato da TeamService quando il leader abbandona il team.
+     *
+     * @param nuovoLeaderId  id del nuovo leader eletto
+     * @param membriRestanti lista dei membri che rimangono nel team (escluso l'ex-leader)
+     * @param nomeTeam       nome del team
+     */
+    public void notificaCambioLeadership(UUID nuovoLeaderId,
+                                         List<MembroTeam> membriRestanti,
+                                         String nomeTeam) {
+        LOG.info(String.format(
+                "Notifica cambio leadership: l'utente (id: %s) è il nuovo leader del team '%s'.",
+                nuovoLeaderId,
+                nomeTeam
+        ));
+        for (MembroTeam membro : membriRestanti) {
+            if (!membro.getId().equals(nuovoLeaderId)) {
+                LOG.info(String.format(
+                        "Notifica membro (id: %s): il leader del team '%s' è cambiato. " +
+                                "Nuovo leader: %s.",
+                        membro.getId(),
+                        nomeTeam,
+                        nuovoLeaderId
+                ));
+            }
+        }
+    }
+
+    /**
+     * Notifica il leader del team che un membro lo ha abbandonato.
+     * Chiamato da TeamService quando un membro non-leader abbandona il team.
+     *
+     * @param idLeader id del leader corrente del team
+     * @param idMembro id del membro che ha abbandonato
+     * @param nomeTeam nome del team
+     */
+    public void notificaAbbandono(UUID idLeader, UUID idMembro, String nomeTeam) {
+        LOG.info(String.format(
+                "Notifica leader (id: %s): il membro (id: %s) ha abbandonato il team '%s'.",
+                idLeader,
+                idMembro,
+                nomeTeam
+        ));
+    }
+
+    // -------------------------------------------------------------------------
+    // Implementazione GestioneRichiestaSupportoObserver (it.4)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Notifica il leader del team che la sua richiesta di supporto è stata presa in carico.
+     * Implementazione di {@link GestioneRichiestaSupportoObserver}.
+     */
+    @Override
+    public void onRichiestaAccettata(UUID idLeader, UUID idRichiesta, UUID idMentore) {
+        LOG.info(String.format(
+                "Notifica leader (id: %s): la richiesta di supporto (id: %s) è stata " +
+                        "PRESA IN CARICO dal mentore (id: %s). Verrà pianificata una call a breve.",
+                idLeader,
+                idRichiesta,
+                idMentore
+        ));
+    }
+
+    /**
+     * Notifica il leader del team che la sua richiesta di supporto è stata respinta.
+     * Implementazione di {@link GestioneRichiestaSupportoObserver}.
+     */
+    @Override
+    public void onRichiestaRespinta(UUID idLeader, UUID idRichiesta, UUID idMentore,
+                                    String motivazione) {
+        LOG.info(String.format(
+                "Notifica leader (id: %s): la richiesta di supporto (id: %s) è stata " +
+                        "RESPINTA dal mentore (id: %s). Motivazione: %s",
+                idLeader,
+                idRichiesta,
+                idMentore,
+                motivazione
+        ));
+    }
+
+    /**
+     * Notifica tutti i membri del team della disiscrizione e scioglimento del gruppo.
+     * Chiamato da TeamRegistrationService dopo l'eliminazione del team.
+     *
+     * @param membri    lista dei membri del team (incluso il leader)
+     * @param team      il team sciolto
+     * @param hackathon l'hackathon da cui il team si è disiscritto
+     */
+    public void notifyTeamUnsubscription(List<MembroTeam> membri, Team team, Hackathon hackathon) {
+        for (MembroTeam membro : membri) {
+            LOG.info(String.format(
+                    "Notifica membro (id: %s): il team '%s' (id: %s) si è disiscritto " +
+                            "dall'hackathon '%s' (id: %s) ed è stato sciolto.",
+                    membro.getId(),
+                    team.getNome(),
+                    team.getId(),
+                    hackathon.getNome(),
+                    hackathon.getId()
+            ));
+        }
     }
 }

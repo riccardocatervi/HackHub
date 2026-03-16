@@ -1,6 +1,5 @@
 package hackhub.service;
 
-import hackhub.dto.PaymentSuccessDTO;
 import hackhub.dto.TransactionReceiptDTO;
 import hackhub.exception.PaymentException;
 import hackhub.payment.PaymentProviderGateway;
@@ -36,8 +35,8 @@ public class PaymentService {
      * @return DTO di conferma con i dettagli della transazione completata
      * @throws PaymentException se la transazione fallisce lato provider
      */
-    public PaymentSuccessDTO disbursePrize(String emailLeader, double importo,
-                                           UUID idHackathon, UUID idTeam) {
+    public TransactionReceiptDTO disbursePrize(String emailLeader, double importo,
+                                               UUID idHackathon, UUID idTeam) {
         LOG.info(String.format(
                 "Avvio erogazione premio — destinatario: %s | importo: €%.2f | hackathon: %s | team: %s",
                 emailLeader, importo, idHackathon, idTeam
@@ -53,12 +52,7 @@ public class PaymentService {
                     receipt.transactionId(), receipt.emailDestinatario(), receipt.importo()
             ));
 
-            return new PaymentSuccessDTO(
-                    receipt.transactionId(),
-                    receipt.emailDestinatario(),
-                    receipt.importo(),
-                    receipt.timestamp()
-            );
+            return receipt;
         } catch (PaymentException e) {
             throw e;
         } catch (Exception e) {

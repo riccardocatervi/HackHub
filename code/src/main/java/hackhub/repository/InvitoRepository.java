@@ -40,4 +40,16 @@ public interface InvitoRepository extends GenericRepository<Invito, UUID> {
      * Utile per determinare quanti slot sono ancora disponibili.
      */
     public int countAccettati(UUID idTeam);
+
+    /**
+     * Restituisce tutti gli inviti in stato IN_ATTESA per un determinato utente.
+     * Utilizzato per mostrare la lista degli inviti pendenti all'utente autenticato.
+     */
+    public List<Invito> findPendingByUtente(UUID idUtente);
+
+    /**
+     * Elimina tutti gli inviti associati a un team.
+     * Chiamato durante la disiscrizione del team dall'hackathon, prima della cancellazione del team.
+     */
+    public void deleteByTeam(UUID idTeam);
 }
