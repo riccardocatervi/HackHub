@@ -181,6 +181,97 @@ public class JdbcTeamRepository implements TeamRepository {
         }
     }
 
+    @Override
+    public Optional<Team> findByMembro(UUID idMembro) {
+        String sql = """
+                SELECT t.*
+                FROM team t
+                JOIN membro_team mt ON mt.id_team = t.id
+                WHERE mt.id_utente = ?
+                ORDER BY t.id DESC
+                LIMIT 1
+                """;
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idMembro);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return Optional.of(mapRow(rs));
+            }
+            return Optional.empty();
+
+        } catch (SQLException e) {
+            throw new PersistenceException(
+                    "Errore durante la ricerca del team per membro " + idMembro + ": " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void removeMembro(UUID idTeam, UUID idMembro) {
+        String sql = "DELETE FROM membro_team WHERE id_team = ? AND id_utente = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idTeam);
+            stmt.setObject(2, idMembro);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new PersistenceException(
+                    "Errore durante la rimozione del membro " + idMembro + " dal team " + idTeam + ": " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void updateLeader(UUID idTeam, UUID nuovoLeaderId) {
+        String sql = "UPDATE team SET id_leader = ? WHERE id = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, nuovoLeaderId);
+            stmt.setObject(2, idTeam);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new PersistenceException(
+                    "Errore durante l'aggiornamento del leader del team " + idTeam + ": " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void delete(Team team) {
+        String sqlMembri = "DELETE FROM membro_team WHERE id_team = ?";
+        String sqlTeam = "DELETE FROM team WHERE id = ?";
+
+        try (Connection conn = dbConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement stmtMembri = conn.prepareStatement(sqlMembri)) {
+                    stmtMembri.setObject(1, team.getId());
+                    stmtMembri.executeUpdate();
+                }
+                try (PreparedStatement stmtTeam = conn.prepareStatement(sqlTeam)) {
+                    stmtTeam.setObject(1, team.getId());
+                    stmtTeam.executeUpdate();
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new PersistenceException(
+                    "Errore durante l'eliminazione del team " + team.getId() + ": " + e.getMessage(), e);
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Mapping
     // -------------------------------------------------------------------------
