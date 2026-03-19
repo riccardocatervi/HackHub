@@ -67,4 +67,14 @@ public interface TeamRepository extends GenericRepository<Team, UUID> {
      * Chiamato durante la disiscrizione del team dall'hackathon.
      */
     public void delete(Team team);
+
+    /**
+     * Restituisce tutti i team di cui un utente è membro accettato,
+     * indipendentemente dall'hackathon.
+     * Utilizzato per il caso d'uso 'Visualizzare team di appartenenza'.
+     *
+     * @param idMembro l'id dell'utente
+     * @return lista di tutti i team dell'utente, ordinata per data di creazione discendente
+     */
+    public List<Team> findAllByMembro(UUID idMembro);
 }

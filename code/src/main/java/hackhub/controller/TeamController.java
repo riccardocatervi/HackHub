@@ -89,4 +89,37 @@ public class TeamController {
     public GestioneTeamResponseDTO confermaAbbandonoTeam(UUID idTeam, UUID idMembro) {
         return teamService.abbandonaTeam(idTeam, idMembro);
     }
+
+    // -----------------------------------------------------------------------
+    // Caso d'uso: Visualizzare team di appartenenza
+    // -----------------------------------------------------------------------
+
+    /**
+     * Restituisce la lista sintetica di tutti i team di cui l'utente è membro.
+     * Punto di ingresso del caso d'uso 'Visualizzare team di appartenenza'.
+     *
+     * @param idUtente id dell'utente autenticato
+     * @return lista di {@link TeamSummaryDTO} con i dati sintetici dei team
+     */
+    public List<TeamSummaryDTO> getUserTeams(UUID idUtente) {
+        if (idUtente == null) {
+            throw new IllegalArgumentException("idUtente non può essere null.");
+        }
+        return teamService.getTeamsByUserId(idUtente);
+    }
+
+    /**
+     * Restituisce i dettagli completi di un team specifico.
+     * Verifica che l'utente richiedente sia membro del team.
+     *
+     * @param idTeam   id del team selezionato
+     * @param idUtente id dell'utente autenticato
+     * @return {@link TeamDetailsDTO} con le informazioni dettagliate del team
+     */
+    public TeamDetailsDTO getTeamDetails(UUID idTeam, UUID idUtente) {
+        if (idTeam == null || idUtente == null) {
+            throw new IllegalArgumentException("idTeam e idUtente non possono essere null.");
+        }
+        return teamService.getTeamDetails(idTeam, idUtente);
+    }
 }
