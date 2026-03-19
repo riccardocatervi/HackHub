@@ -57,6 +57,73 @@ public class JdbcMentoreRepository implements MentoreRepository {
         }
     }
 
+    @Override
+    public List<Mentore> findAllAvailable(UUID idHackathon) {
+        String sql = """
+                SELECT m.*
+                FROM mentore m
+                WHERE m.id NOT IN (
+                    SELECT hm.id_mentore
+                    FROM hackathon_mentori hm
+                    WHERE hm.id_hackathon = ?
+                )
+                ORDER BY m.cognome, m.nome
+                """;
+
+        List<Mentore> mentori = new ArrayList<>();
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idHackathon);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                mentori.add(mapRow(rs));
+            }
+            return mentori;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Errore durante il recupero dei mentori disponibili per l'hackathon " +
+                            idHackathon + ": " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<Mentore> findAllByIds(List<UUID> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Costruisce i placeholder per la clausola IN
+        String placeholders = ids.stream()
+                .map(id -> "?")
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("?");
+
+        String sql = "SELECT * FROM mentore WHERE id IN (" + placeholders + ") ORDER BY cognome, nome";
+        List<Mentore> mentori = new ArrayList<>();
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < ids.size(); i++) {
+                stmt.setObject(i + 1, ids.get(i));
+            }
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                mentori.add(mapRow(rs));
+            }
+            return mentori;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Errore durante il recupero dei mentori per id: " + e.getMessage(), e);
+        }
+    }
+
     private Mentore mapRow(ResultSet rs) throws SQLException {
         return new Mentore(
                 (UUID) rs.getObject("id"),

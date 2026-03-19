@@ -88,4 +88,29 @@ public class Team {
             this.membri.removeIf(m -> m.getId().equals(idMembro));
         }
     }
+
+    /**
+     * Verifica se un utente è già membro effettivo del team.
+     * Agisce come Information Expert: conosce la propria composizione.
+     * Richiede che la lista membri sia stata caricata tramite setMembri().
+     *
+     * @param idUtente l'id dell'utente da verificare
+     * @return true se l'utente è membro del team, false altrimenti
+     */
+    public boolean hasMember(UUID idUtente) {
+        if (this.membri == null) {
+            return false;
+        }
+        return this.membri.stream().anyMatch(m -> m.getId().equals(idUtente));
+    }
+
+    /**
+     * Restituisce il numero di membri effettivi del team.
+     * Richiede che la lista membri sia stata caricata tramite setMembri().
+     *
+     * @return numero di membri, 0 se la lista non è stata caricata
+     */
+    public int getMembersCount() {
+        return this.membri == null ? 0 : this.membri.size();
+    }
 }

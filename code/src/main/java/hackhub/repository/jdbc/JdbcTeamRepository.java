@@ -272,6 +272,35 @@ public class JdbcTeamRepository implements TeamRepository {
         }
     }
 
+    @Override
+    public List<Team> findAllByMembro(UUID idMembro) {
+        String sql = """
+                SELECT t.*
+                FROM team t
+                JOIN membro_team mt ON mt.id_team = t.id
+                WHERE mt.id_utente = ?
+                ORDER BY t.id DESC
+                """;
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idMembro);
+            ResultSet rs = stmt.executeQuery();
+
+            List<Team> risultato = new ArrayList<>();
+            while (rs.next()) {
+                risultato.add(mapRow(rs));
+            }
+            return risultato;
+
+        } catch (SQLException e) {
+            throw new PersistenceException(
+                    "Errore durante il recupero di tutti i team del membro " +
+                            idMembro + ": " + e.getMessage(), e);
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Mapping
     // -------------------------------------------------------------------------

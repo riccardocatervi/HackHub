@@ -52,4 +52,24 @@ public interface InvitoRepository extends GenericRepository<Invito, UUID> {
      * Chiamato durante la disiscrizione del team dall'hackathon, prima della cancellazione del team.
      */
     public void deleteByTeam(UUID idTeam);
+
+    /**
+     * Conta gli inviti in stato IN_ATTESA per un determinato team.
+     * Utilizzato per verificare la capienza del team prima di inviare un nuovo invito.
+     *
+     * @param idTeam l'id del team
+     * @return il numero di inviti pendenti
+     */
+    public int countPendingByTeam(UUID idTeam);
+
+    /**
+     * Verifica se esiste già un invito in un certo stato per un utente in un determinato team.
+     * Utilizzato per evitare inviti duplicati.
+     *
+     * @param idUtente l'id dell'utente
+     * @param idTeam   l'id del team
+     * @param stato    lo stato da verificare
+     * @return true se esiste già un invito con quel stato, false altrimenti
+     */
+    public boolean existsByUtenteAndTeamAndStato(UUID idUtente, UUID idTeam, StatoInvito stato);
 }

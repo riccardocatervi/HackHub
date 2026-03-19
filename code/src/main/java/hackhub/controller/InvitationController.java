@@ -1,6 +1,7 @@
 package hackhub.controller;
 
 import hackhub.dto.InvitationResponseDTO;
+import hackhub.dto.InviteCreatedDTO;
 import hackhub.dto.InvitoListaItemDTO;
 import hackhub.service.InvitationService;
 
@@ -49,5 +50,26 @@ public class InvitationController {
             throw new IllegalArgumentException("idInvito e idUtente non possono essere null.");
         }
         return invitationService.processResponse(idInvito, idUtente, accettato);
+    }
+
+    // -----------------------------------------------------------------------
+    // Caso d'uso: Invitare utente a unirsi al team
+    // -----------------------------------------------------------------------
+
+    /**
+     * Riceve la richiesta di invio di un nuovo invito, estrae il richiedente
+     * e delega l'intero flusso a {@link InvitationService}.
+     *
+     * @param teamId       id del team per cui si invia l'invito
+     * @param targetUserId id dell'utente da invitare
+     * @param requesterId  id dell'utente richiedente (deve essere il leader del team)
+     * @return DTO di conferma con i dettagli dell'invito appena creato
+     */
+    public InviteCreatedDTO sendInvite(UUID teamId, UUID targetUserId, UUID requesterId) {
+        if (teamId == null || targetUserId == null || requesterId == null) {
+            throw new IllegalArgumentException(
+                    "teamId, targetUserId e requesterId non possono essere null.");
+        }
+        return invitationService.createInvite(teamId, targetUserId, requesterId);
     }
 }

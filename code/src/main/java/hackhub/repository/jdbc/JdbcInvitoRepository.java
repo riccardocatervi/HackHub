@@ -205,6 +205,44 @@ public class JdbcInvitoRepository implements InvitoRepository {
         }
     }
 
+    @Override
+    public int countPendingByTeam(UUID idTeam) {
+        String sql = "SELECT COUNT(*) FROM invito WHERE id_team = ? AND stato = 'IN_ATTESA'";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idTeam);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
+
+        } catch (SQLException e) {
+            throw new PersistenceException(
+                    "Errore durante il conteggio degli inviti pendenti per il team " +
+                            idTeam + ": " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public boolean existsByUtenteAndTeamAndStato(UUID idUtente, UUID idTeam, StatoInvito stato) {
+        String sql = "SELECT COUNT(*) FROM invito WHERE id_utente = ? AND id_team = ? AND stato = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idUtente);
+            stmt.setObject(2, idTeam);
+            stmt.setString(3, stato.name());
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() && rs.getInt(1) > 0;
+
+        } catch (SQLException e) {
+            throw new PersistenceException(
+                    "Errore durante la verifica dell'invito per utente " + idUtente +
+                            " e team " + idTeam + ": " + e.getMessage(), e);
+        }
+    }
+
     private Invito mapRow(ResultSet rs) throws SQLException {
         return new Invito(
                 (UUID) rs.getObject("id"),

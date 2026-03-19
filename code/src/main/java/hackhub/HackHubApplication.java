@@ -96,7 +96,9 @@ public class HackHubApplication {
         valutazioneService.addObserver(notificationsService);
 
         // --- Controller layer (Constructor Injection) ---
-        HackathonController hackathonController = new HackathonController(hackathonService);
+        VisualizzaHackathonIscrittoService visualizzaHackathonIscrittoService =
+                new VisualizzaHackathonIscrittoService(teamRepository, hackathonRepository);
+        HackathonController hackathonController = new HackathonController(hackathonService, visualizzaHackathonIscrittoService);
         SottomissioneController sottomissioneController = new SottomissioneController(sottomissioneService);
         ProclamazioneController proclamazioneController = new ProclamazioneController(proclamazioneService);
         RegistrationController registrationController = new RegistrationController(utenteService, oauthService);
