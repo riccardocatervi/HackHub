@@ -189,6 +189,136 @@ public class JdbcHackathonRepository implements HackathonRepository {
         }
     }
 
+    @Override
+    public List<Hackathon> findByOrganizzatore(UUID idOrganizzatore) {
+        String sql = """
+                SELECT h.*,
+                       array_remove(array_agg(hm.id_mentore), NULL) AS mentori
+                FROM hackathon h
+                LEFT JOIN hackathon_mentori hm ON hm.id_hackathon = h.id
+                WHERE h.id_organizzatore = ?
+                GROUP BY h.id
+                ORDER BY h.data_inizio DESC
+                """;
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, idOrganizzatore);
+            ResultSet rs = stmt.executeQuery();
+
+            List<Hackathon> risultato = new ArrayList<>();
+            while (rs.next()) {
+                risultato.add(mapRow(rs));
+            }
+            return risultato;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Errore durante il recupero degli hackathon dell'organizzatore " +
+                            idOrganizzatore + ": " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void updateMentori(UUID idHackathon, List<UUID> nuoviIdsMentori) {
+        String sqlElimina = "DELETE FROM hackathon_mentori WHERE id_hackathon = ?";
+        String sqlInserisci = "INSERT INTO hackathon_mentori (id_hackathon, id_mentore) VALUES (?, ?)";
+
+        try (Connection conn = dbConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                // Rimuove tutte le associazioni precedenti
+                try (PreparedStatement stmtDel = conn.prepareStatement(sqlElimina)) {
+                    stmtDel.setObject(1, idHackathon);
+                    stmtDel.executeUpdate();
+                }
+                // Inserisce le nuove associazioni
+                if (nuoviIdsMentori != null && !nuoviIdsMentori.isEmpty()) {
+                    try (PreparedStatement stmtIns = conn.prepareStatement(sqlInserisci)) {
+                        for (UUID idMentore : nuoviIdsMentori) {
+                            stmtIns.setObject(1, idHackathon);
+                            stmtIns.setObject(2, idMentore);
+                            stmtIns.addBatch();
+                        }
+                        stmtIns.executeBatch();
+                    }
+                }
+                conn.commit();
+            } catch (SQLException ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Errore durante l'aggiornamento dei mentori per l'hackathon " +
+                            idHackathon + ": " + e.getMessage(), e);
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Caso d'uso: Visualizzare informazioni pubbliche sugli hackathon
+    // -----------------------------------------------------------------------
+
+    @Override
+    public List<Hackathon> findAllAvailable() {
+        String sql = """
+                SELECT h.*,
+                       array_remove(array_agg(hm.id_mentore), NULL) AS mentori
+                FROM hackathon h
+                LEFT JOIN hackathon_mentori hm ON hm.id_hackathon = h.id
+                WHERE h.stato != 'CONCLUSO'
+                GROUP BY h.id
+                ORDER BY h.data_inizio DESC
+                """;
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            List<Hackathon> risultato = new ArrayList<>();
+            while (rs.next()) {
+                risultato.add(mapRow(rs));
+            }
+            return risultato;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Errore durante il recupero degli hackathon disponibili: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Optional<Hackathon> findByIdAndDisponibile(UUID id) {
+        String sql = """
+                SELECT h.*,
+                       array_remove(array_agg(hm.id_mentore), NULL) AS mentori
+                FROM hackathon h
+                LEFT JOIN hackathon_mentori hm ON hm.id_hackathon = h.id
+                WHERE h.id = ? AND h.stato != 'CONCLUSO'
+                GROUP BY h.id
+                """;
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return Optional.of(mapRow(rs));
+            }
+            return Optional.empty();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Errore durante il recupero dell'hackathon disponibile con id " + id +
+                            ": " + e.getMessage(), e);
+        }
+    }
+
     private Hackathon mapRow(ResultSet rs) throws SQLException {
         UUID id = (UUID) rs.getObject("id");
         String via = rs.getString("via");

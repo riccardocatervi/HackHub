@@ -5,9 +5,11 @@ import hackhub.model.OAuthProvider;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Servizio di integrazione OAuth2 (Java SE, senza Spring Security).
@@ -67,6 +69,106 @@ public class OAuthService {
             Thread.currentThread().interrupt();
             throw new RuntimeException(
                     "Errore di comunicazione con il provider OAuth2 " + provider + ": " + e.getMessage(), e);
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Flusso Authorization Code — Step 1: generazione URL di autorizzazione
+    // -----------------------------------------------------------------------
+
+    /**
+     * Costruisce l'URL di autorizzazione OAuth2/OIDC verso il provider selezionato.
+     * Il visitatore viene reindirizzato a questo URL per autenticarsi e concedere i consensi.
+     *
+     * @param provider    provider OAuth2 (GOOGLE o GITHUB)
+     * @param clientId    identificativo del client registrato presso il provider
+     * @param redirectUri URI di callback registrato presso il provider
+     * @param state       token anti-CSRF da includere nella richiesta
+     * @return URL completo a cui reindirizzare il visitatore
+     */
+    public String buildAuthorizationUrl(OAuthProvider provider,
+                                        String clientId,
+                                        String redirectUri,
+                                        String state) {
+        String encodedRedirect = URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
+        String encodedState = URLEncoder.encode(state, StandardCharsets.UTF_8);
+
+        return switch (provider) {
+            case GOOGLE -> String.format(
+                    "https://accounts.google.com/o/oauth2/v2/auth" +
+                            "?client_id=%s&redirect_uri=%s&response_type=code" +
+                            "&scope=openid%%20email%%20profile&state=%s",
+                    clientId, encodedRedirect, encodedState);
+            case GITHUB -> String.format(
+                    "https://github.com/login/oauth/authorize" +
+                            "?client_id=%s&redirect_uri=%s&scope=user%%3Aemail&state=%s",
+                    clientId, encodedRedirect, encodedState);
+        };
+    }
+
+    // -----------------------------------------------------------------------
+    // Flusso Authorization Code — Step 2: scambio codice per access token
+    // -----------------------------------------------------------------------
+
+    /**
+     * Scambia il codice di autorizzazione con un access token HTTP chiamando
+     * il token endpoint del provider.
+     *
+     * @param authorizationCode codice restituito dal provider al callback URI
+     * @param provider          provider OAuth2 (GOOGLE o GITHUB)
+     * @param clientId          identificativo del client
+     * @param clientSecret      segreto del client
+     * @param redirectUri       lo stesso redirect URI usato nella richiesta iniziale
+     * @return access token da usare per recuperare le informazioni utente
+     * @throws RuntimeException se lo scambio fallisce o il provider restituisce un errore
+     */
+    public String scambiaCodiceConToken(String authorizationCode,
+                                        OAuthProvider provider,
+                                        String clientId,
+                                        String clientSecret,
+                                        String redirectUri) {
+        String tokenEndpoint = switch (provider) {
+            case GOOGLE -> "https://oauth2.googleapis.com/token";
+            case GITHUB -> "https://github.com/login/oauth/access_token";
+        };
+
+        String corpo = "grant_type=authorization_code"
+                + "&code=" + URLEncoder.encode(authorizationCode, StandardCharsets.UTF_8)
+                + "&client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8)
+                + "&client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8)
+                + "&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(tokenEndpoint))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .header("Accept", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(corpo))
+                .build();
+
+        try {
+            HttpResponse<String> response =
+                    httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                throw new RuntimeException(
+                        "Errore nello scambio del codice con " + provider +
+                                ": HTTP " + response.statusCode());
+            }
+
+            String accessToken = estraiValore(response.body(), "access_token");
+            if (accessToken == null || accessToken.isBlank()) {
+                String errore = estraiValore(response.body(), "error");
+                throw new RuntimeException(
+                        "Il provider " + provider + " non ha restituito un access_token valido." +
+                                (errore != null ? " Errore: " + errore : ""));
+            }
+            return accessToken;
+
+        } catch (IOException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(
+                    "Errore di comunicazione durante lo scambio del codice con " + provider +
+                            ": " + e.getMessage(), e);
         }
     }
 
