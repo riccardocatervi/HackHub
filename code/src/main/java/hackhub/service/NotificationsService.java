@@ -8,10 +8,14 @@ import hackhub.model.entity.RichiestaSupporto;
 import hackhub.model.entity.Segnalazione;
 import hackhub.model.entity.Team;
 import hackhub.model.entity.Valutazione;
+import hackhub.model.entity.Mentore;
+import hackhub.service.observer.GestioneMentoriObserver;
 import hackhub.service.observer.GestioneRichiestaSupportoObserver;
 import hackhub.service.observer.GestioneSegnalazioneObserver;
 import hackhub.service.observer.InvitationObserver;
+import hackhub.service.observer.NuovoInvitoObserver;
 import hackhub.service.observer.RichiestaSupportoObserver;
+import hackhub.service.observer.RispostaCallObserver;
 import hackhub.service.observer.SegnalazioneObserver;
 import hackhub.service.observer.ValutazioneObserver;
 
@@ -34,7 +38,8 @@ import java.util.logging.Logger;
  */
 public class NotificationsService implements SegnalazioneObserver, ValutazioneObserver,
         GestioneSegnalazioneObserver, RichiestaSupportoObserver, InvitationObserver,
-        GestioneRichiestaSupportoObserver {
+        GestioneRichiestaSupportoObserver, GestioneMentoriObserver, NuovoInvitoObserver,
+        RispostaCallObserver {
 
     private static final Logger LOG = Logger.getLogger(NotificationsService.class.getName());
 
@@ -326,5 +331,120 @@ public class NotificationsService implements SegnalazioneObserver, ValutazioneOb
                     hackathon.getId()
             ));
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // Implementazione GestioneMentoriObserver (it.5)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Notifica i mentori appena aggiunti all'hackathon.
+     * Implementazione di {@link GestioneMentoriObserver}.
+     */
+    @Override
+    public void onMentoriAggiunti(List<Mentore> nuoviMentori, Hackathon hackathon) {
+        for (Mentore mentore : nuoviMentori) {
+            LOG.info(String.format(
+                    "Notifica mentore (id: %s, email: %s): sei stato aggiunto come mentore " +
+                            "all'hackathon '%s' (id: %s).",
+                    mentore.getId(),
+                    mentore.getEmail(),
+                    hackathon.getNome(),
+                    hackathon.getId()
+            ));
+        }
+    }
+
+    /**
+     * Notifica i mentori rimossi dall'hackathon.
+     * Implementazione di {@link GestioneMentoriObserver}.
+     */
+    @Override
+    public void onMentoriRimossi(List<Mentore> mentoriRimossi, Hackathon hackathon) {
+        for (Mentore mentore : mentoriRimossi) {
+            LOG.info(String.format(
+                    "Notifica mentore (id: %s, email: %s): sei stato rimosso dalla lista mentori " +
+                            "dell'hackathon '%s' (id: %s).",
+                    mentore.getId(),
+                    mentore.getEmail(),
+                    hackathon.getNome(),
+                    hackathon.getId()
+            ));
+        }
+    }
+
+    /**
+     * Metodo diretto invocato da {@link HackathonService} per notificare l'aggiunta di mentori.
+     *
+     * @param nuoviMentori lista dei mentori aggiunti
+     * @param hackathon    l'hackathon interessato
+     */
+    public void notificaNuoviMentori(List<Mentore> nuoviMentori, Hackathon hackathon) {
+        onMentoriAggiunti(nuoviMentori, hackathon);
+    }
+
+    /**
+     * Metodo diretto invocato da {@link HackathonService} per notificare la rimozione di mentori.
+     *
+     * @param mentoriRimossi lista dei mentori rimossi
+     * @param hackathon      l'hackathon interessato
+     */
+    public void notificaRimozioneMentori(List<Mentore> mentoriRimossi, Hackathon hackathon) {
+        onMentoriRimossi(mentoriRimossi, hackathon);
+    }
+
+    // -------------------------------------------------------------------------
+    // Implementazione NuovoInvitoObserver (it.5)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Notifica l'utente destinatario della ricezione di un nuovo invito a unirsi a un team.
+     * Implementazione di {@link NuovoInvitoObserver}.
+     */
+    @Override
+    public void onNuovoInvito(Invito invito, String emailDestinatario, String nomeTeam) {
+        LOG.info(String.format(
+                "Notifica utente (email: %s): hai ricevuto un invito (id: %s) a unirti " +
+                        "al team '%s' (id: %s) per l'hackathon %s.",
+                emailDestinatario,
+                invito.getId(),
+                nomeTeam,
+                invito.getIdTeam(),
+                invito.getIdHackathon()
+        ));
+    }
+
+    // -------------------------------------------------------------------------
+    // Implementazione RispostaCallObserver (it.5)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Notifica il mentore che il leader del team ha accettato l'invito alla call.
+     * Implementazione di {@link RispostaCallObserver}.
+     */
+    @Override
+    public void onCallAccettata(UUID idCall, String emailMentore, String nomeTeam) {
+        LOG.info(String.format(
+                "Notifica mentore (email: %s): il team '%s' ha ACCETTATO l'invito " +
+                        "alla call (id: %s). La call è confermata.",
+                emailMentore,
+                nomeTeam,
+                idCall
+        ));
+    }
+
+    /**
+     * Notifica il mentore che il leader del team ha rifiutato l'invito alla call.
+     * Implementazione di {@link RispostaCallObserver}.
+     */
+    @Override
+    public void onCallRifiutata(UUID idCall, String emailMentore, String nomeTeam) {
+        LOG.info(String.format(
+                "Notifica mentore (email: %s): il team '%s' ha RIFIUTATO l'invito " +
+                        "alla call (id: %s).",
+                emailMentore,
+                nomeTeam,
+                idCall
+        ));
     }
 }

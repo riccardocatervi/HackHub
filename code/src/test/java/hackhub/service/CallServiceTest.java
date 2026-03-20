@@ -19,9 +19,11 @@ import hackhub.model.entity.Utente;
 import hackhub.model.state.StatoInCorso;
 import hackhub.repository.CallRepository;
 import hackhub.repository.HackathonRepository;
+import hackhub.repository.MentoreRepository;
 import hackhub.repository.RichiestaSupportoRepository;
 import hackhub.repository.TeamRepository;
 import hackhub.repository.UserRepository;
+import hackhub.service.observer.RispostaCallObserver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -55,6 +57,8 @@ class CallServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private CallRepository callRepository;
     @Mock private CalendarService calendarService;
+    @Mock private MentoreRepository mentoreRepository;
+    @Mock private RispostaCallObserver rispostaCallObserver;
 
     private CallService service;
 
@@ -72,7 +76,8 @@ class CallServiceTest {
     void setUp() {
         service = new CallService(
                 richiestaSupportoRepository, teamRepository, hackathonRepository,
-                userRepository, callRepository, calendarService);
+                userRepository, callRepository, calendarService,
+                mentoreRepository, rispostaCallObserver);
     }
 
     // =========================================================================
