@@ -2,23 +2,33 @@ package hackhub.service;
 
 import hackhub.dto.CallCreateDTO;
 import hackhub.dto.CallFormDTO;
+import hackhub.dto.CallInviteListItemDTO;
+import hackhub.dto.CallInviteResponseDTO;
 import hackhub.dto.CallResponseDTO;
 import hackhub.dto.DatiEventoEsterno;
 import hackhub.exception.CalendarConnectionException;
+import hackhub.exception.CallNotFoundException;
 import hackhub.exception.HackathonNotFoundException;
+import hackhub.exception.InvalidCallStateException;
 import hackhub.exception.SupportRequestNotFoundException;
 import hackhub.exception.TeamNotFoundException;
 import hackhub.exception.UnauthorizedActionException;
 import hackhub.exception.ValidationException;
+import hackhub.model.StatoCall;
 import hackhub.model.entity.Call;
+import hackhub.model.entity.Mentore;
 import hackhub.model.entity.RichiestaSupporto;
 import hackhub.model.entity.Team;
 import hackhub.repository.CallRepository;
 import hackhub.repository.HackathonRepository;
+import hackhub.repository.MentoreRepository;
 import hackhub.repository.RichiestaSupportoRepository;
 import hackhub.repository.TeamRepository;
 import hackhub.repository.UserRepository;
+import hackhub.service.observer.RispostaCallObserver;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -51,19 +61,25 @@ public class CallService {
     private final UserRepository userRepository;
     private final CallRepository callRepository;
     private final CalendarService calendarService;
+    private final MentoreRepository mentoreRepository;
+    private final RispostaCallObserver rispostaCallObserver;
 
     public CallService(RichiestaSupportoRepository richiestaSupportoRepository,
                        TeamRepository teamRepository,
                        HackathonRepository hackathonRepository,
                        UserRepository userRepository,
                        CallRepository callRepository,
-                       CalendarService calendarService) {
+                       CalendarService calendarService,
+                       MentoreRepository mentoreRepository,
+                       RispostaCallObserver rispostaCallObserver) {
         this.richiestaSupportoRepository = richiestaSupportoRepository;
         this.teamRepository = teamRepository;
         this.hackathonRepository = hackathonRepository;
         this.userRepository = userRepository;
         this.callRepository = callRepository;
         this.calendarService = calendarService;
+        this.mentoreRepository = mentoreRepository;
+        this.rispostaCallObserver = rispostaCallObserver;
     }
 
     // -------------------------------------------------------------------------
@@ -162,6 +178,144 @@ public class CallService {
                 "Call pianificata con successo per il team '" + team.getNome()
                         + "'. Invito inviato al leader tramite il sistema Calendar."
         );
+    }
+
+    // -------------------------------------------------------------------------
+    // Caso d'uso: Gestire invito a call da parte di un mentore (it.5)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Restituisce la lista degli inviti a call pendenti ricevuti dal leader del team.
+     * <p>
+     * Recupera tutte le call associate alle richieste di supporto del team specificato
+     * e arricchisce ciascuna con i dati del mentore mittente.
+     *
+     * @param idTeam   l'id del team del leader
+     * @param idLeader l'id del leader autenticato
+     * @return lista di {@link CallInviteListItemDTO} con gli inviti ricevuti
+     * @throws TeamNotFoundException       se il team non esiste
+     * @throws UnauthorizedActionException se l'utente non è il leader del team
+     */
+    public List<CallInviteListItemDTO> getCallInvites(UUID idTeam, UUID idLeader) {
+        Team team = teamRepository.findById(idTeam)
+                .orElseThrow(() -> new TeamNotFoundException(idTeam));
+
+        if (!team.getIdLeader().equals(idLeader)) {
+            throw new UnauthorizedActionException(
+                    "L'utente " + idLeader + " non è il leader del team " + idTeam +
+                            " e non può visualizzare gli inviti a call.");
+        }
+
+        List<Call> calls = callRepository.findByTeamId(idTeam);
+
+        List<CallInviteListItemDTO> risultato = new ArrayList<>();
+        for (Call call : calls) {
+            RichiestaSupporto richiesta = richiestaSupportoRepository
+                    .findById(call.getIdRichiestaSupporto())
+                    .orElse(null);
+
+            if (richiesta == null) {
+                continue;
+            }
+
+            Mentore mentore = mentoreRepository.findById(richiesta.getIdMentore())
+                    .orElse(null);
+
+            String nomeMentore = mentore != null ? mentore.getNome() : "N/D";
+            String cognomeMentore = mentore != null ? mentore.getCognome() : "N/D";
+
+            risultato.add(new CallInviteListItemDTO(
+                    call.getId(),
+                    call.getIdRichiestaSupporto(),
+                    richiesta.getIdMentore(),
+                    nomeMentore,
+                    cognomeMentore,
+                    call.getDataCall(),
+                    call.getOraCall(),
+                    call.getLinkCall(),
+                    call.getDescrizione(),
+                    call.getStato()
+            ));
+        }
+        return risultato;
+    }
+
+    /**
+     * Processa la risposta del leader a un invito a call (accettazione o rifiuto).
+     * <p>
+     * Flusso:
+     * <ol>
+     *   <li>Verifica che la call esista.</li>
+     *   <li>Carica la richiesta di supporto per risalire al team e al mentore.</li>
+     *   <li>Verifica che il richiedente sia il leader del team.</li>
+     *   <li>Verifica che la call sia ancora in stato PENDENTE.</li>
+     *   <li>Aggiorna lo stato della call nel database.</li>
+     *   <li>Notifica il mentore tramite l'observer.</li>
+     * </ol>
+     *
+     * @param idCall    l'id della call a cui rispondere
+     * @param idLeader  l'id del leader autenticato
+     * @param accettata true per accettare, false per rifiutare
+     * @return {@link CallInviteResponseDTO} con il nuovo stato e messaggio di conferma
+     * @throws CallNotFoundException                  se la call non esiste
+     * @throws SupportRequestNotFoundException        se la richiesta di supporto non esiste
+     * @throws TeamNotFoundException                  se il team non esiste
+     * @throws UnauthorizedActionException            se l'utente non è il leader del team
+     * @throws InvalidCallStateException              se la call non è più in stato PENDENTE
+     * @throws hackhub.exception.PersistenceException se il salvataggio fallisce
+     */
+    public CallInviteResponseDTO processInviteResponse(UUID idCall,
+                                                       UUID idLeader,
+                                                       boolean accettata) {
+        // 1. Recupera la call
+        Call call = callRepository.findById(idCall)
+                .orElseThrow(() -> new CallNotFoundException(idCall));
+
+        // 2. Recupera la richiesta di supporto per risalire al team e al mentore
+        RichiestaSupporto richiesta = richiestaSupportoRepository
+                .findById(call.getIdRichiestaSupporto())
+                .orElseThrow(() -> new SupportRequestNotFoundException(call.getIdRichiestaSupporto()));
+
+        // 3. Verifica che il richiedente sia il leader del team (Information Expert)
+        Team team = teamRepository.findById(richiesta.getIdTeam())
+                .orElseThrow(() -> new TeamNotFoundException(richiesta.getIdTeam()));
+
+        if (!team.getIdLeader().equals(idLeader)) {
+            throw new UnauthorizedActionException(
+                    "L'utente " + idLeader + " non è il leader del team " + team.getId() +
+                            " e non può rispondere all'invito a call.");
+        }
+
+        // 4. Valida lo stato della call: deve essere PENDENTE
+        if (call.getStato() != StatoCall.PENDENTE) {
+            throw new InvalidCallStateException(
+                    "Impossibile rispondere alla call " + idCall +
+                            ": lo stato attuale è " + call.getStato() +
+                            " (atteso PENDENTE).");
+        }
+
+        // 5. Aggiorna lo stato nel database (propaga PersistenceException se fallisce)
+        StatoCall nuovoStato = accettata ? StatoCall.ACCETTATA : StatoCall.RIFIUTATA;
+        callRepository.updateStato(idCall, nuovoStato);
+        call.setStato(nuovoStato);
+
+        // 6. Notifica il mentore tramite observer
+        Mentore mentore = mentoreRepository.findById(richiesta.getIdMentore()).orElse(null);
+        String emailMentore = mentore != null ? mentore.getEmail() : null;
+
+        if (emailMentore != null) {
+            if (accettata) {
+                rispostaCallObserver.onCallAccettata(idCall, emailMentore, team.getNome());
+            } else {
+                rispostaCallObserver.onCallRifiutata(idCall, emailMentore, team.getNome());
+            }
+        }
+
+        String messaggio = accettata
+                ? "Invito alla call accettato con successo. Il mentore sarà notificato dell'accettazione."
+                : "Invito alla call rifiutato. Il mentore sarà notificato del rifiuto.";
+
+        return new CallInviteResponseDTO(idCall, team.getId(), nuovoStato, messaggio);
     }
 
     // -------------------------------------------------------------------------
