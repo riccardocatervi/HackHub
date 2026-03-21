@@ -8,11 +8,11 @@ import java.util.UUID;
  * la motivazione inserita dal mentore; altrimenti è {@code null}.
  * Usato nel caso d'uso 'Prendere in carico una richiesta di supporto'.
  *
- * @param idRichiesta  id della richiesta gestita
- * @param idTeam       id del team richiedente
- * @param nomeTeam     nome del team richiedente
- * @param motivazione  motivazione del rifiuto (null se la richiesta è stata accettata)
- * @param messaggio    messaggio descrittivo dell'esito dell'operazione
+ * @param idRichiesta id della richiesta gestita
+ * @param idTeam      id del team richiedente
+ * @param nomeTeam    nome del team richiedente
+ * @param motivazione motivazione del rifiuto (null se la richiesta è stata accettata)
+ * @param messaggio   messaggio descrittivo dell'esito dell'operazione
  */
 public record EsitoGestioneRichiestaDTO(
         UUID idRichiesta,
