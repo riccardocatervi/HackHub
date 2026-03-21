@@ -247,4 +247,31 @@ public class Hackathon {
     public void setPremioDisbursed(boolean premioDisbursed) {
         this.premioDisbursed = premioDisbursed;
     }
+
+    // -------------------------------------------------------------------------
+    // Gestione mentori (GRASP: Information Expert)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Aggiunge l'id di un mentore alla lista in memoria.
+     * La lista deve essere mutabile (garantito quando l'entità è ricostruita dal DB).
+     * La persistenza è delegata al repository tramite updateMentori().
+     *
+     * @param idMentore l'id del mentore da aggiungere
+     */
+    public void addMentore(UUID idMentore) {
+        if (!idsMentori.contains(idMentore)) {
+            idsMentori.add(idMentore);
+        }
+    }
+
+    /**
+     * Rimuove l'id di un mentore dalla lista in memoria.
+     * La persistenza è delegata al repository tramite updateMentori().
+     *
+     * @param idMentore l'id del mentore da rimuovere
+     */
+    public void removeMentore(UUID idMentore) {
+        idsMentori.remove(idMentore);
+    }
 }

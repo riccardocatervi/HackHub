@@ -1,22 +1,28 @@
 package hackhub.service;
 
 import hackhub.dto.InvitationResponseDTO;
+import hackhub.dto.InviteCreatedDTO;
 import hackhub.dto.InvitoListaItemDTO;
 import hackhub.exception.HackathonNotFoundException;
 import hackhub.exception.InvitationNotFoundException;
 import hackhub.exception.InvalidInvitationStateException;
+import hackhub.exception.TeamCapacityExceededException;
 import hackhub.exception.TeamNotFoundException;
 import hackhub.exception.UnauthorizedActionException;
 import hackhub.exception.UserAlreadyInTeamException;
+import hackhub.exception.UserNotFoundException;
+import hackhub.exception.UserNotEligibleException;
 import hackhub.model.StatoInvito;
 import hackhub.model.entity.Hackathon;
 import hackhub.model.entity.Invito;
 import hackhub.model.entity.Team;
+import hackhub.model.entity.Utente;
 import hackhub.repository.HackathonRepository;
 import hackhub.repository.InvitoRepository;
 import hackhub.repository.TeamRepository;
 import hackhub.repository.UserRepository;
 import hackhub.service.observer.InvitationObserver;
+import hackhub.service.observer.NuovoInvitoObserver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +42,7 @@ public class InvitationService {
     private final HackathonRepository hackathonRepository;
     private final UserRepository userRepository;
     private final List<InvitationObserver> observers = new ArrayList<>();
+    private final List<NuovoInvitoObserver> nuovoInvitoObservers = new ArrayList<>();
 
     public InvitationService(InvitoRepository invitoRepository,
                              TeamRepository teamRepository,
@@ -177,6 +184,106 @@ public class InvitationService {
         );
     }
 
+    /**
+     * Registra un observer per l'evento di creazione di un nuovo invito.
+     *
+     * @param observer implementazione che riceverà le notifiche
+     */
+    public void addNuovoInvitoObserver(NuovoInvitoObserver observer) {
+        this.nuovoInvitoObservers.add(observer);
+    }
+
+    // -----------------------------------------------------------------------
+    // Caso d'uso: Invitare utente a unirsi al team
+    // -----------------------------------------------------------------------
+
+    /**
+     * Crea e invia un nuovo invito a un utente per unirsi a un team.
+     * <p>
+     * Flusso:
+     * <ol>
+     *   <li>Verifica che il richiedente sia il leader del team.</li>
+     *   <li>Verifica la capienza: membri effettivi + inviti pendenti &lt; dimensione max.</li>
+     *   <li>Verifica l'esistenza dell'utente target.</li>
+     *   <li>Verifica che l'utente non sia già membro e non abbia già un invito pendente.</li>
+     *   <li>Persiste il nuovo invito in stato IN_ATTESA.</li>
+     *   <li>Notifica l'utente invitato.</li>
+     * </ol>
+     *
+     * @param teamId       l'id del team per cui si invia l'invito
+     * @param targetUserId l'id dell'utente da invitare
+     * @param requesterId  l'id dell'utente richiedente (deve essere il leader)
+     * @return {@link InviteCreatedDTO} con i dettagli dell'invito creato
+     * @throws TeamNotFoundException         se il team non esiste
+     * @throws UnauthorizedActionException   se il richiedente non è il leader del team
+     * @throws TeamCapacityExceededException se il team ha raggiunto la capienza massima
+     * @throws UserNotFoundException         se l'utente target non esiste
+     * @throws UserNotEligibleException      se l'utente è già membro o ha un invito pendente
+     * @throws PersistenceException          se la persistenza del nuovo invito fallisce
+     */
+    public InviteCreatedDTO createInvite(UUID teamId, UUID targetUserId, UUID requesterId) {
+        // Carica il team e verifica che il richiedente sia il leader
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new TeamNotFoundException(teamId));
+
+        if (!team.getIdLeader().equals(requesterId)) {
+            throw new UnauthorizedActionException(
+                    "Solo il leader del team può inviare inviti. " +
+                            "L'utente " + requesterId + " non è il leader del team " + teamId);
+        }
+
+        // Recupera l'hackathon per controllare la dimensione massima del team
+        Hackathon hackathon = hackathonRepository.findById(team.getIdHackathon())
+                .orElseThrow(() -> new HackathonNotFoundException(
+                        "Hackathon non trovato: " + team.getIdHackathon()));
+
+        // Conta i membri effettivi del team
+        int membriAttuali = teamRepository.findMembri(teamId).size();
+
+        // Conta gli inviti pendenti
+        int invitatiPendenti = invitoRepository.countPendingByTeam(teamId);
+
+        // Verifica la capienza: membri + pendenti non deve raggiungere la dimensione massima
+        if (membriAttuali + invitatiPendenti >= hackathon.getDimensioneMaxTeam()) {
+            throw new TeamCapacityExceededException(teamId, hackathon.getDimensioneMaxTeam());
+        }
+
+        // Verifica esistenza dell'utente target
+        Utente utente = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new UserNotFoundException(targetUserId));
+
+        // Verifica che l'utente non sia già membro del team
+        boolean giaMembro = teamRepository.findMembri(teamId)
+                .stream().anyMatch(m -> m.getId().equals(targetUserId));
+        if (giaMembro) {
+            throw new UserNotEligibleException(targetUserId,
+                    "è già membro effettivo del team " + teamId);
+        }
+
+        // Verifica che non esista già un invito pendente per lo stesso utente e team
+        if (invitoRepository.existsByUtenteAndTeamAndStato(targetUserId, teamId, StatoInvito.IN_ATTESA)) {
+            throw new UserNotEligibleException(targetUserId,
+                    "ha già un invito in attesa per il team " + teamId);
+        }
+
+        // Crea e persiste il nuovo invito
+        Invito nuovoInvito = new Invito(teamId, targetUserId, team.getIdHackathon());
+        invitoRepository.save(nuovoInvito);
+
+        // Notifica l'utente invitato
+        notificaNuovoInvito(nuovoInvito, utente.getEmail(), team.getNome());
+
+        return new InviteCreatedDTO(
+                nuovoInvito.getId(),
+                team.getId(),
+                team.getNome(),
+                utente.getId(),
+                utente.getEmail(),
+                "Invito inviato con successo all'utente " + utente.getNome() +
+                        " " + utente.getCognome() + " per il team '" + team.getNome() + "'."
+        );
+    }
+
     // -------------------------------------------------------------------------
     // Notifica Observer (pattern GoF)
     // -------------------------------------------------------------------------
@@ -189,6 +296,12 @@ public class InvitationService {
             } else {
                 observer.onInvitoRifiutato(invito, idCreatore, nomeInvitato);
             }
+        }
+    }
+
+    private void notificaNuovoInvito(Invito invito, String emailDestinatario, String nomeTeam) {
+        for (NuovoInvitoObserver observer : nuovoInvitoObservers) {
+            observer.onNuovoInvito(invito, emailDestinatario, nomeTeam);
         }
     }
 }

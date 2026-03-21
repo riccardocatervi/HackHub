@@ -5,7 +5,9 @@ import hackhub.builder.EquipeCreationResult;
 import hackhub.dto.*;
 import hackhub.exception.HackathonNotFoundException;
 import hackhub.exception.InvalidHackathonStateException;
+import hackhub.exception.NoTeamsFoundException;
 import hackhub.exception.TeamNotFoundException;
+import hackhub.exception.UnauthorizedActionException;
 import hackhub.exception.UserAlreadyInTeamException;
 import hackhub.exception.ValidationException;
 import hackhub.model.StatoInvito;
@@ -360,5 +362,83 @@ public class TeamService {
                                 "e non può essere invitato.");
             }
         }
+    }
+
+    // -----------------------------------------------------------------------
+    // Caso d'uso: Visualizzare team di appartenenza (UC3)
+    // -----------------------------------------------------------------------
+
+    /**
+     * Restituisce la lista sintetica di tutti i team di cui un utente è membro.
+     *
+     * @param idUtente l'id dell'utente autenticato
+     * @return lista di {@link TeamSummaryDTO} con i dati sintetici dei team
+     * @throws NoTeamsFoundException se l'utente non è membro di alcun team
+     */
+    public List<TeamSummaryDTO> getTeamsByUserId(UUID idUtente) {
+        List<Team> teams = teamRepository.findAllByMembro(idUtente);
+
+        if (teams.isEmpty()) {
+            throw new NoTeamsFoundException(idUtente);
+        }
+
+        List<TeamSummaryDTO> risultato = new ArrayList<>();
+        for (Team team : teams) {
+            Hackathon hackathon = hackathonRepository.findById(team.getIdHackathon())
+                    .orElseThrow(() -> new HackathonNotFoundException(
+                            "Hackathon non trovato: " + team.getIdHackathon()));
+
+            risultato.add(new TeamSummaryDTO(
+                    team.getId(),
+                    team.getNome(),
+                    hackathon.getId(),
+                    hackathon.getNome(),
+                    hackathon.getStatoEnum(),
+                    team.getIdLeader().equals(idUtente)
+            ));
+        }
+        return risultato;
+    }
+
+    /**
+     * Restituisce i dettagli completi di un team specifico, verificando che
+     * l'utente richiedente ne sia effettivamente membro.
+     *
+     * @param idTeam   l'id del team di cui si richiedono i dettagli
+     * @param idUtente l'id dell'utente autenticato
+     * @return {@link TeamDetailsDTO} con i dati completi del team
+     * @throws TeamNotFoundException       se il team non esiste
+     * @throws HackathonNotFoundException  se l'hackathon associato non esiste
+     * @throws UnauthorizedActionException se l'utente non è membro del team
+     */
+    public TeamDetailsDTO getTeamDetails(UUID idTeam, UUID idUtente) {
+        Team team = teamRepository.findById(idTeam)
+                .orElseThrow(() -> new TeamNotFoundException(idTeam));
+
+        // Carica i membri per abilitare la verifica tramite l'entità (Information Expert)
+        List<MembroTeam> membri = teamRepository.findMembri(idTeam);
+        team.setMembri(membri);
+
+        // Verifica che l'utente richiedente sia membro del team
+        if (!team.hasMember(idUtente)) {
+            throw new UnauthorizedActionException(
+                    "L'utente " + idUtente + " non è membro del team " + idTeam +
+                            " e non può visualizzarne i dettagli.");
+        }
+
+        Hackathon hackathon = hackathonRepository.findById(team.getIdHackathon())
+                .orElseThrow(() -> new HackathonNotFoundException(
+                        "Hackathon non trovato: " + team.getIdHackathon()));
+
+        return new TeamDetailsDTO(
+                team.getId(),
+                team.getNome(),
+                team.getDescrizione(),
+                team.getIdLeader(),
+                hackathon.getId(),
+                hackathon.getNome(),
+                hackathon.getStatoEnum(),
+                membri
+        );
     }
 }
