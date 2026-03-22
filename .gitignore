@@ -51,6 +51,33 @@ teamworkUser.xml
 vp.log
 *.log
 
+# FILE SENSIBILI / CREDENZIALI
+
+# Configurazione applicazione con credenziali reali
+# (il file .example è escluso da questa regola perché ha nome diverso)
+application.properties
+application-dev.properties
+application-prod.properties
+application-local.properties
+
+# Variabili d'ambiente
+.env
+.env.*
+*.env
+
+# Chiavi private, certificati e keystore
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+*.pfx
+
+# File generici di credenziali/segreti
+secrets.properties
+*secret*.properties
+*credentials*
+
 # JAVA
 
 *.class
