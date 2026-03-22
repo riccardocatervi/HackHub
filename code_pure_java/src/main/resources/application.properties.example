@@ -1,0 +1,22 @@
+# =============================================================================
+# HackHub — Configurazione Database (TEMPLATE)
+#
+# ISTRUZIONI:
+#   1. Copia questo file e rinominalo in 'application.properties'
+#   2. Imposta i valori corretti per il tuo ambiente locale
+#   3. NON committare 'application.properties' su git: contiene credenziali!
+#      Il file è già incluso nel .gitignore.
+#
+# ALTERNATIVA SICURA (produzione / CI-CD):
+#   Imposta le variabili d'ambiente seguenti che sovrascrivono questo file:
+#     DB_URL   = URL JDBC del database
+#     DB_USER  = utente del database
+#     DB_PASS  = password del database
+# =============================================================================
+
+# URL di connessione JDBC al database PostgreSQL
+db.url=jdbc:postgresql://localhost:5432/hackhub
+
+# Credenziali di accesso
+db.username=postgres
+db.password=CHANGE_ME
