@@ -208,44 +208,265 @@ Per visualizzare il file è necessario **Visual Paradigm** (edizione Community o
 
 ## Setup e Avvio
 
-### Prerequisiti
-
-- Java 21+
-- Gradle 8+
-- PostgreSQL 13+
+> **Versione avviabile:** solo `code_porting_springboot` (Spring Boot 3.4.4).
+> L'implementazione `code_pure_java` non espone un server HTTP — vedi la sezione dedicata in fondo.
 
 ---
 
-### ▶ Porting Spring Boot 3.4.4 — unica versione avviabile
+### Passo 1 — Installare Java 21
 
-> **Il file `application.properties` non è incluso nel repository** (contiene credenziali).
-> È obbligatorio crearlo prima di avviare l'applicazione.
+<details>
+<summary><strong>Windows</strong></summary>
 
-**Passo 1 — Creare il database PostgreSQL**
+1. Vai su [adoptium.net](https://adoptium.net)
+2. Scarica **Temurin 21 (LTS)** per Windows (`.msi`)
+3. Avvia il file `.msi` e segui l'installazione — lascia tutte le opzioni di default
+4. Al termine, apri il **Prompt dei comandi** (`cmd`) e digita:
+   ```
+   java -version
+   ```
+   Deve comparire una riga con `openjdk 21` o simile. Se compare, Java è installato correttamente.
 
-```sql
-CREATE DATABASE hackhub;
-```
+</details>
 
-**Passo 2 — Creare il file di configurazione**
+<details>
+<summary><strong>macOS</strong></summary>
+
+1. Vai su [adoptium.net](https://adoptium.net)
+2. Scarica **Temurin 21 (LTS)** per macOS (`.pkg`)
+3. Apri il file `.pkg` e segui l'installazione
+4. Apri il **Terminale** e digita:
+   ```bash
+   java -version
+   ```
+   Deve comparire una riga con `openjdk 21`.
+
+</details>
+
+<details>
+<summary><strong>Linux (Ubuntu/Debian)</strong></summary>
 
 ```bash
-cd code_porting_springboot/src/main/resources
-cp application.properties.example application.properties
+sudo apt update
+sudo apt install -y wget apt-transport-https
+wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | sudo tee /etc/apt/trusted.gpg.d/adoptium.asc
+echo "deb https://packages.adoptium.net/artifactory/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/adoptium.list
+sudo apt update
+sudo apt install -y temurin-21-jdk
+java -version
 ```
 
-Aprire `application.properties` e sostituire `YOUR_POSTGRES_USER` e `YOUR_POSTGRES_PASSWORD` con le proprie credenziali PostgreSQL.
+</details>
 
-**Passo 3 — Avviare l'applicazione**
+---
+
+### Passo 2 — Installare PostgreSQL
+
+<details>
+<summary><strong>Windows</strong></summary>
+
+1. Vai su [postgresql.org/download/windows](https://www.postgresql.org/download/windows/)
+2. Clicca **Download the installer** (EDB installer)
+3. Scarica la versione **16** o superiore per Windows x86-64
+4. Avvia l'installer:
+   - **Installation Directory**: lascia il default
+   - **Components**: lascia tutto spuntato (incluso **pgAdmin 4** e **Command Line Tools**)
+   - **Data Directory**: lascia il default
+   - **Password**: scegli una password per l'utente `postgres` — **annotala**, ti servirà dopo
+   - **Port**: `5432` (default — non cambiare)
+   - **Locale**: lascia il default
+5. Clicca **Next** fino a **Finish**
+6. Al termine si aprirà Stack Builder — puoi chiuderlo senza installare nulla
+
+**Verifica:** cerca **pgAdmin 4** nel menu Start e aprilo — se si avvia, PostgreSQL funziona.
+
+</details>
+
+<details>
+<summary><strong>macOS</strong></summary>
+
+Il modo più semplice è usare [Postgres.app](https://postgresapp.com):
+
+1. Vai su [postgresapp.com](https://postgresapp.com)
+2. Scarica l'ultima versione e trascinala in `/Applications`
+3. Aprila e clicca **Initialize**
+4. PostgreSQL è ora in esecuzione sulla porta `5432`
+5. L'utente di default è il tuo nome utente macOS, senza password
+
+In alternativa, con Homebrew:
+```bash
+brew install postgresql@16
+brew services start postgresql@16
+```
+
+</details>
+
+<details>
+<summary><strong>Linux (Ubuntu/Debian)</strong></summary>
+
+```bash
+sudo apt update
+sudo apt install -y postgresql postgresql-contrib
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+```
+
+</details>
+
+---
+
+### Passo 3 — Creare il database
+
+<details>
+<summary><strong>Windows — tramite pgAdmin 4</strong></summary>
+
+1. Apri **pgAdmin 4** dal menu Start
+2. Nel pannello sinistro espandi **Servers** → **PostgreSQL 16** → inserisci la password scelta durante l'installazione
+3. Tasto destro su **Databases** → **Create** → **Database...**
+4. Nel campo **Database** scrivi: `hackhub`
+5. Clicca **Save**
+
+</details>
+
+<details>
+<summary><strong>Windows — tramite riga di comando</strong></summary>
+
+1. Apri il **Prompt dei comandi** come Amministratore
+2. Vai nella cartella bin di PostgreSQL (adatta il percorso se necessario):
+   ```
+   cd "C:\Program Files\PostgreSQL\16\bin"
+   ```
+3. Connettiti come utente postgres:
+   ```
+   psql -U postgres
+   ```
+4. Inserisci la password scelta durante l'installazione
+5. Digita:
+   ```sql
+   CREATE DATABASE hackhub;
+   ```
+6. Poi:
+   ```
+   \q
+   ```
+
+</details>
+
+<details>
+<summary><strong>macOS / Linux</strong></summary>
+
+Apri il Terminale e digita:
+
+```bash
+psql -U postgres -c "CREATE DATABASE hackhub;"
+```
+
+Su macOS con Postgres.app, sostituisci `postgres` con il tuo nome utente macOS:
+```bash
+psql -c "CREATE DATABASE hackhub;"
+```
+
+</details>
+
+---
+
+### Passo 4 — Creare il file di configurazione
+
+Il file `application.properties` **non è incluso nel repository** perché contiene credenziali personali. Va creato manualmente copiando il file di esempio.
+
+<details>
+<summary><strong>Windows — tramite Esplora File</strong></summary>
+
+1. Apri Esplora File e naviga nella cartella del progetto:
+   ```
+   code_porting_springboot\src\main\resources\
+   ```
+2. Trova il file `application.properties.example`
+3. Fai una copia: tasto destro → **Copia** → tasto destro nello stesso punto → **Incolla**
+4. Rinomina la copia in `application.properties` (rimuovi `.example`)
+
+</details>
+
+<details>
+<summary><strong>Windows — tramite Prompt dei comandi</strong></summary>
+
+Dalla cartella radice del progetto:
+```
+copy code_porting_springboot\src\main\resources\application.properties.example code_porting_springboot\src\main\resources\application.properties
+```
+
+</details>
+
+<details>
+<summary><strong>macOS / Linux — tramite Terminale</strong></summary>
+
+Dalla cartella radice del progetto:
+```bash
+cp code_porting_springboot/src/main/resources/application.properties.example \
+   code_porting_springboot/src/main/resources/application.properties
+```
+
+</details>
+
+Apri `application.properties` con qualsiasi editor di testo (Notepad, VS Code, IntelliJ, ecc.) e sostituisci:
+
+```properties
+spring.datasource.username=YOUR_POSTGRES_USER     ← sostituisci con il tuo utente PostgreSQL (di solito: postgres)
+spring.datasource.password=YOUR_POSTGRES_PASSWORD ← sostituisci con la tua password PostgreSQL
+```
+
+Salva il file. Non modificare nient'altro.
+
+---
+
+### Passo 5 — Avviare l'applicazione
+
+<details>
+<summary><strong>Windows — tramite Prompt dei comandi</strong></summary>
+
+1. Apri il **Prompt dei comandi**
+2. Naviga nella cartella del progetto, ad esempio:
+   ```
+   cd C:\Users\TuoNome\Documents\HackHub\code_porting_springboot
+   ```
+3. Avvia il server:
+   ```
+   gradlew.bat bootRun
+   ```
+   > La prima volta Gradle scarica le dipendenze: potrebbero volerci alcuni minuti. È normale.
+
+</details>
+
+<details>
+<summary><strong>macOS / Linux — tramite Terminale</strong></summary>
 
 ```bash
 cd code_porting_springboot
 ./gradlew bootRun
 ```
 
+> Se compare l'errore `Permission denied`, esegui prima: `chmod +x gradlew`
+
+</details>
+
+<details>
+<summary><strong>IntelliJ IDEA (tutti i sistemi operativi)</strong></summary>
+
+1. Apri IntelliJ IDEA → **File** → **Open** → seleziona la cartella `code_porting_springboot`
+2. Attendi che IntelliJ indicizzi il progetto e scarichi le dipendenze Gradle
+3. In alto a destra clicca sul menu a tendina della run configuration → seleziona `HackHubApplication` (o equivalente)
+4. Clicca ▶️ per avviare
+
+</details>
+
+**Il server è avviato correttamente quando nel log compare:**
+```
+Started HackHubApplication in X.XXX seconds
+```
+
 > Spring Boot crea automaticamente tutte le tabelle all'avvio tramite `schema.sql`.
 > Non è necessario eseguire lo script manualmente.
-> Il server si avvia sulla porta **8080**.
+> Il server è raggiungibile su **http://localhost:8080**
 
 ---
 
@@ -258,10 +479,18 @@ cd code_porting_springboot
 
 Per compilare e lanciare i test:
 
+**macOS / Linux:**
 ```bash
 cd code_pure_java
 ./gradlew build
 ./gradlew test
+```
+
+**Windows:**
+```
+cd code_pure_java
+gradlew.bat build
+gradlew.bat test
 ```
 
 ---
@@ -462,44 +691,263 @@ The file `uml/HackHub.vpp` contains the complete UML model of the project, organ
 
 ## Setup and Running
 
-### Prerequisites
-
-- Java 21+
-- Gradle 8+
-- PostgreSQL 13+
+> **Runnable version:** only `code_porting_springboot` (Spring Boot 3.4.4).
+> The `code_pure_java` implementation does not expose an HTTP server — see the dedicated section at the bottom.
 
 ---
 
-### ▶ Spring Boot 3.4.4 porting — only runnable version
+### Step 1 — Install Java 21
 
-> **The `application.properties` file is not included in the repository** (it contains credentials).
-> It must be created before starting the application.
+<details>
+<summary><strong>Windows</strong></summary>
 
-**Step 1 — Create the PostgreSQL database**
+1. Go to [adoptium.net](https://adoptium.net)
+2. Download **Temurin 21 (LTS)** for Windows (`.msi`)
+3. Run the `.msi` installer — leave all options as default
+4. When done, open **Command Prompt** (`cmd`) and type:
+   ```
+   java -version
+   ```
+   You should see a line containing `openjdk 21`. If so, Java is correctly installed.
 
-```sql
-CREATE DATABASE hackhub;
-```
+</details>
 
-**Step 2 — Create the configuration file**
+<details>
+<summary><strong>macOS</strong></summary>
+
+1. Go to [adoptium.net](https://adoptium.net)
+2. Download **Temurin 21 (LTS)** for macOS (`.pkg`)
+3. Open the `.pkg` file and follow the installer
+4. Open **Terminal** and type:
+   ```bash
+   java -version
+   ```
+   You should see a line containing `openjdk 21`.
+
+</details>
+
+<details>
+<summary><strong>Linux (Ubuntu/Debian)</strong></summary>
 
 ```bash
-cd code_porting_springboot/src/main/resources
-cp application.properties.example application.properties
+sudo apt update
+sudo apt install -y wget apt-transport-https
+wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | sudo tee /etc/apt/trusted.gpg.d/adoptium.asc
+echo "deb https://packages.adoptium.net/artifactory/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/adoptium.list
+sudo apt update
+sudo apt install -y temurin-21-jdk
+java -version
 ```
 
-Open `application.properties` and replace `YOUR_POSTGRES_USER` and `YOUR_POSTGRES_PASSWORD` with your PostgreSQL credentials.
+</details>
 
-**Step 3 — Start the application**
+---
+
+### Step 2 — Install PostgreSQL
+
+<details>
+<summary><strong>Windows</strong></summary>
+
+1. Go to [postgresql.org/download/windows](https://www.postgresql.org/download/windows/)
+2. Click **Download the installer** (EDB installer)
+3. Download version **16** or higher for Windows x86-64
+4. Run the installer:
+   - **Installation Directory**: leave as default
+   - **Components**: leave everything checked (including **pgAdmin 4** and **Command Line Tools**)
+   - **Data Directory**: leave as default
+   - **Password**: choose a password for the `postgres` user — **write it down**, you will need it later
+   - **Port**: `5432` (default — do not change)
+   - **Locale**: leave as default
+5. Click **Next** through to **Finish**
+6. Stack Builder will open at the end — you can close it without installing anything
+
+**Verify:** search for **pgAdmin 4** in the Start menu and open it — if it launches, PostgreSQL is working.
+
+</details>
+
+<details>
+<summary><strong>macOS</strong></summary>
+
+The easiest way is to use [Postgres.app](https://postgresapp.com):
+
+1. Go to [postgresapp.com](https://postgresapp.com)
+2. Download the latest version and drag it to `/Applications`
+3. Open it and click **Initialize**
+4. PostgreSQL is now running on port `5432`
+5. The default user is your macOS username, with no password
+
+Alternatively, with Homebrew:
+```bash
+brew install postgresql@16
+brew services start postgresql@16
+```
+
+</details>
+
+<details>
+<summary><strong>Linux (Ubuntu/Debian)</strong></summary>
+
+```bash
+sudo apt update
+sudo apt install -y postgresql postgresql-contrib
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+```
+
+</details>
+
+---
+
+### Step 3 — Create the database
+
+<details>
+<summary><strong>Windows — via pgAdmin 4</strong></summary>
+
+1. Open **pgAdmin 4** from the Start menu
+2. In the left panel expand **Servers** → **PostgreSQL 16** → enter the password you chose during installation
+3. Right-click on **Databases** → **Create** → **Database...**
+4. In the **Database** field type: `hackhub`
+5. Click **Save**
+
+</details>
+
+<details>
+<summary><strong>Windows — via Command Prompt</strong></summary>
+
+1. Open **Command Prompt** as Administrator
+2. Navigate to PostgreSQL's bin folder (adjust path if needed):
+   ```
+   cd "C:\Program Files\PostgreSQL\16\bin"
+   ```
+3. Connect as the postgres user:
+   ```
+   psql -U postgres
+   ```
+4. Enter the password you chose during installation
+5. Type:
+   ```sql
+   CREATE DATABASE hackhub;
+   ```
+6. Then:
+   ```
+   \q
+   ```
+
+</details>
+
+<details>
+<summary><strong>macOS / Linux — via Terminal</strong></summary>
+
+```bash
+psql -U postgres -c "CREATE DATABASE hackhub;"
+```
+
+On macOS with Postgres.app, replace `postgres` with your macOS username:
+```bash
+psql -c "CREATE DATABASE hackhub;"
+```
+
+</details>
+
+---
+
+### Step 4 — Create the configuration file
+
+The `application.properties` file is **not included in the repository** because it contains personal credentials. It must be created manually by copying the example file.
+
+<details>
+<summary><strong>Windows — via File Explorer</strong></summary>
+
+1. Open File Explorer and navigate to:
+   ```
+   code_porting_springboot\src\main\resources\
+   ```
+2. Find the file `application.properties.example`
+3. Make a copy: right-click → **Copy** → right-click in the same folder → **Paste**
+4. Rename the copy to `application.properties` (remove `.example`)
+
+</details>
+
+<details>
+<summary><strong>Windows — via Command Prompt</strong></summary>
+
+From the project root folder:
+```
+copy code_porting_springboot\src\main\resources\application.properties.example code_porting_springboot\src\main\resources\application.properties
+```
+
+</details>
+
+<details>
+<summary><strong>macOS / Linux — via Terminal</strong></summary>
+
+From the project root folder:
+```bash
+cp code_porting_springboot/src/main/resources/application.properties.example \
+   code_porting_springboot/src/main/resources/application.properties
+```
+
+</details>
+
+Open `application.properties` with any text editor (Notepad, VS Code, IntelliJ, etc.) and replace:
+
+```properties
+spring.datasource.username=YOUR_POSTGRES_USER     ← replace with your PostgreSQL username (usually: postgres)
+spring.datasource.password=YOUR_POSTGRES_PASSWORD ← replace with your PostgreSQL password
+```
+
+Save the file. Do not modify anything else.
+
+---
+
+### Step 5 — Start the application
+
+<details>
+<summary><strong>Windows — via Command Prompt</strong></summary>
+
+1. Open **Command Prompt**
+2. Navigate to the project folder, for example:
+   ```
+   cd C:\Users\YourName\Documents\HackHub\code_porting_springboot
+   ```
+3. Start the server:
+   ```
+   gradlew.bat bootRun
+   ```
+   > The first time, Gradle will download dependencies — this may take a few minutes. This is normal.
+
+</details>
+
+<details>
+<summary><strong>macOS / Linux — via Terminal</strong></summary>
 
 ```bash
 cd code_porting_springboot
 ./gradlew bootRun
 ```
 
+> If you get a `Permission denied` error, first run: `chmod +x gradlew`
+
+</details>
+
+<details>
+<summary><strong>IntelliJ IDEA (all operating systems)</strong></summary>
+
+1. Open IntelliJ IDEA → **File** → **Open** → select the `code_porting_springboot` folder
+2. Wait for IntelliJ to index the project and download Gradle dependencies
+3. In the top-right corner click the run configuration dropdown → select `HackHubApplication` (or equivalent)
+4. Click ▶️ to start
+
+</details>
+
+**The server has started correctly when the log shows:**
+```
+Started HackHubApplication in X.XXX seconds
+```
+
 > Spring Boot automatically creates all tables on startup via `schema.sql`.
 > There is no need to run the script manually.
-> The server starts on port **8080**.
+> The server is available at **http://localhost:8080**
 
 ---
 
@@ -512,8 +960,16 @@ cd code_porting_springboot
 
 To compile and run the tests:
 
+**macOS / Linux:**
 ```bash
 cd code_pure_java
 ./gradlew build
 ./gradlew test
+```
+
+**Windows:**
+```
+cd code_pure_java
+gradlew.bat build
+gradlew.bat test
 ```
