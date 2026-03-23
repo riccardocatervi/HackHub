@@ -216,7 +216,7 @@ Per visualizzare il file è necessario **Visual Paradigm** (edizione Community o
 
 ---
 
-### ▶ Porting Spring Boot 3.4.4 (consigliato)
+### ▶ Porting Spring Boot 3.4.4 — unica versione avviabile
 
 > **Il file `application.properties` non è incluso nel repository** (contiene credenziali).
 > È obbligatorio crearlo prima di avviare l'applicazione.
@@ -249,18 +249,18 @@ cd code_porting_springboot
 
 ---
 
-### Avvio (implementazione Java puro)
+### Implementazione Java puro — non avviabile
+
+> L'implementazione in `code_pure_java` non espone un server HTTP avviabile.
+> Contiene la logica di dominio completa (service, repository JDBC, pattern State/Observer)
+> sviluppata nelle prime iterazioni del progetto; il porting in Spring Boot è stato richiesto
+> esplicitamente come deliverable finale del corso per fornire un'applicazione eseguibile.
+
+Per compilare e lanciare i test:
 
 ```bash
 cd code_pure_java
 ./gradlew build
-./gradlew run
-```
-
-### Esecuzione dei Test
-
-```bash
-cd code_pure_java
 ./gradlew test
 ```
 
@@ -470,7 +470,7 @@ The file `uml/HackHub.vpp` contains the complete UML model of the project, organ
 
 ---
 
-### ▶ Spring Boot 3.4.4 porting (recommended)
+### ▶ Spring Boot 3.4.4 porting — only runnable version
 
 > **The `application.properties` file is not included in the repository** (it contains credentials).
 > It must be created before starting the application.
@@ -503,17 +503,17 @@ cd code_porting_springboot
 
 ---
 
-### Running (pure Java implementation)
+### Pure Java implementation — not runnable
+
+> The `code_pure_java` implementation does not expose a runnable HTTP server.
+> It contains the complete domain logic (services, JDBC repositories, State/Observer patterns)
+> developed during the earlier project iterations; the Spring Boot porting was explicitly required
+> as the final course deliverable to provide a runnable application.
+
+To compile and run the tests:
 
 ```bash
 cd code_pure_java
 ./gradlew build
-./gradlew run
-```
-
-### Running Tests
-
-```bash
-cd code_pure_java
 ./gradlew test
 ```
