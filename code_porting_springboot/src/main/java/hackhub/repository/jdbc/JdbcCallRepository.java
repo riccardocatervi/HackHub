@@ -31,7 +31,7 @@ public class JdbcCallRepository implements CallRepository {
         String sql = """
                 INSERT INTO call_pianificata
                     (id_richiesta_supporto, data_call, ora_call, link_call, descrizione, data_creazione, stato)
-                VALUES (?, ?, ?, ?, ?, ?, ?::stato_call)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 RETURNING id
                 """;
 
@@ -106,7 +106,7 @@ public class JdbcCallRepository implements CallRepository {
 
     @Override
     public void updateStato(UUID idCall, StatoCall nuovoStato) {
-        String sql = "UPDATE call_pianificata SET stato = ?::stato_call WHERE id = ?";
+        String sql = "UPDATE call_pianificata SET stato = ? WHERE id = ?";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

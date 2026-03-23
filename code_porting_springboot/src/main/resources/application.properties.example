@@ -1,0 +1,25 @@
+# HackHub — Configurazione Spring Boot
+# Copia questo file in application.properties e sostituisci
+# i valori segnaposto con quelli del tuo ambiente locale.
+
+# DATABASE PostgreSQL
+# Assicurati di avere PostgreSQL in esecuzione e di aver creato
+# il database con: CREATE DATABASE hackhub;
+spring.datasource.url=jdbc:postgresql://localhost:5432/hackhub
+spring.datasource.username=YOUR_POSTGRES_USER
+spring.datasource.password=YOUR_POSTGRES_PASSWORD
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# INIZIALIZZAZIONE SCHEMA
+# Spring esegue schema.sql all'avvio; tutte le istruzioni usano
+# IF NOT EXISTS, quindi le tabelle non vengono ricreate se esistono già.
+spring.sql.init.mode=always
+spring.sql.init.schema-locations=classpath:schema.sql
+
+# LOGGING
+logging.level.hackhub=INFO
+# Mostra in console le query SQL eseguite dai repository JDBC
+logging.level.org.springframework.jdbc=DEBUG
+
+# SERVER
+server.port=8080

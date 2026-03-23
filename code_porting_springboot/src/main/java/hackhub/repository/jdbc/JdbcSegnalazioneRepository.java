@@ -26,7 +26,7 @@ public class JdbcSegnalazioneRepository implements SegnalazioneRepository {
     public void save(Segnalazione segnalazione) {
         String sql = """
                 INSERT INTO segnalazione (id_team, id_mentore, id_hackathon, descrizione, prove, stato)
-                VALUES (?, ?, ?, ?, ?, ?::stato_segnalazione)
+                VALUES (?, ?, ?, ?, ?, ?)
                 RETURNING id
                 """;
 
@@ -96,7 +96,7 @@ public class JdbcSegnalazioneRepository implements SegnalazioneRepository {
 
     @Override
     public void updateStato(UUID idSegnalazione, StatoSegnalazione stato) {
-        String sql = "UPDATE segnalazione SET stato = ?::stato_segnalazione WHERE id = ?";
+        String sql = "UPDATE segnalazione SET stato = ? WHERE id = ?";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

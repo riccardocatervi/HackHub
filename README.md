@@ -9,6 +9,8 @@
 
 ## Indice / Table of Contents
 
+- 🚀 **[Setup e Avvio (IT)](#setup-e-avvio)** — Come avviare il progetto
+- 🚀 **[Setup and Running (EN)](#setup-and-running)** — How to run the project
 - [Italiano](#-hackhub--italiano)
 - [English](#-hackhub--english)
 
@@ -179,9 +181,11 @@ HackHub/
 │       │   ├── payment/             # Gateway pagamento (interfaccia + mock)
 │       │   └── infrastructure/      # DBConnection, DBConfig
 │       └── main/resources/
-│           ├── application.properties.example
 │           └── schema.sql
 ├── code_porting_springboot/         # Porting Spring Boot 3.4.4
+│   └── src/main/resources/
+│       ├── application.properties.example   # ← copiare in application.properties
+│       └── schema.sql
 ├── uml/
 │   └── HackHub.vpp                  # Modello UML Visual Paradigm (tutte le iterazioni)
 └── README.md
@@ -208,13 +212,42 @@ Per visualizzare il file è necessario **Visual Paradigm** (edizione Community o
 
 - Java 21+
 - Gradle 8+
-- PostgreSQL 15+
+- PostgreSQL 13+
 
-### Configurazione del Database
+---
 
-1. Creare un database PostgreSQL.
-2. Eseguire lo script `src/main/resources/schema.sql` per creare le tabelle.
-3. Copiare `src/main/resources/application.properties.example` in `application.properties` e configurare le credenziali del database.
+### ▶ Porting Spring Boot 3.4.4 (consigliato)
+
+> **Il file `application.properties` non è incluso nel repository** (contiene credenziali).
+> È obbligatorio crearlo prima di avviare l'applicazione.
+
+**Passo 1 — Creare il database PostgreSQL**
+
+```sql
+CREATE DATABASE hackhub;
+```
+
+**Passo 2 — Creare il file di configurazione**
+
+```bash
+cd code_porting_springboot/src/main/resources
+cp application.properties.example application.properties
+```
+
+Aprire `application.properties` e sostituire `YOUR_POSTGRES_USER` e `YOUR_POSTGRES_PASSWORD` con le proprie credenziali PostgreSQL.
+
+**Passo 3 — Avviare l'applicazione**
+
+```bash
+cd code_porting_springboot
+./gradlew bootRun
+```
+
+> Spring Boot crea automaticamente tutte le tabelle all'avvio tramite `schema.sql`.
+> Non è necessario eseguire lo script manualmente.
+> Il server si avvia sulla porta **8080**.
+
+---
 
 ### Avvio (implementazione Java puro)
 
@@ -222,13 +255,6 @@ Per visualizzare il file è necessario **Visual Paradigm** (edizione Community o
 cd code_pure_java
 ./gradlew build
 ./gradlew run
-```
-
-### Avvio (porting Spring Boot)
-
-```bash
-cd code_porting_springboot
-./gradlew bootRun
 ```
 
 ### Esecuzione dei Test
@@ -409,9 +435,11 @@ HackHub/
 │       │   ├── payment/             # Payment gateway (interface + mock)
 │       │   └── infrastructure/      # DBConnection, DBConfig
 │       └── main/resources/
-│           ├── application.properties.example
 │           └── schema.sql
 ├── code_porting_springboot/         # Spring Boot 3.4.4 porting
+│   └── src/main/resources/
+│       ├── application.properties.example   # ← copy to application.properties
+│       └── schema.sql
 ├── uml/
 │   └── HackHub.vpp                  # Visual Paradigm UML model (all iterations)
 └── README.md
@@ -438,13 +466,42 @@ The file `uml/HackHub.vpp` contains the complete UML model of the project, organ
 
 - Java 21+
 - Gradle 8+
-- PostgreSQL 15+
+- PostgreSQL 13+
 
-### Database Setup
+---
 
-1. Create a PostgreSQL database.
-2. Run the script `src/main/resources/schema.sql` to create all tables.
-3. Copy `src/main/resources/application.properties.example` to `application.properties` and configure database credentials.
+### ▶ Spring Boot 3.4.4 porting (recommended)
+
+> **The `application.properties` file is not included in the repository** (it contains credentials).
+> It must be created before starting the application.
+
+**Step 1 — Create the PostgreSQL database**
+
+```sql
+CREATE DATABASE hackhub;
+```
+
+**Step 2 — Create the configuration file**
+
+```bash
+cd code_porting_springboot/src/main/resources
+cp application.properties.example application.properties
+```
+
+Open `application.properties` and replace `YOUR_POSTGRES_USER` and `YOUR_POSTGRES_PASSWORD` with your PostgreSQL credentials.
+
+**Step 3 — Start the application**
+
+```bash
+cd code_porting_springboot
+./gradlew bootRun
+```
+
+> Spring Boot automatically creates all tables on startup via `schema.sql`.
+> There is no need to run the script manually.
+> The server starts on port **8080**.
+
+---
 
 ### Running (pure Java implementation)
 
@@ -452,13 +509,6 @@ The file `uml/HackHub.vpp` contains the complete UML model of the project, organ
 cd code_pure_java
 ./gradlew build
 ./gradlew run
-```
-
-### Running (Spring Boot porting)
-
-```bash
-cd code_porting_springboot
-./gradlew bootRun
 ```
 
 ### Running Tests

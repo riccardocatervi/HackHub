@@ -167,7 +167,7 @@ public class JdbcRichiestaSupportoRepository implements RichiestaSupportoReposit
 
     @Override
     public void aggiornaStato(UUID idRichiesta, StatoRichiesta stato) {
-        String sql = "UPDATE richiesta_supporto SET stato = ?::stato_richiesta WHERE id = ?";
+        String sql = "UPDATE richiesta_supporto SET stato = ? WHERE id = ?";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -184,7 +184,7 @@ public class JdbcRichiestaSupportoRepository implements RichiestaSupportoReposit
 
     @Override
     public void aggiornaStatoEMotivazione(UUID idRichiesta, StatoRichiesta stato, String motivazione) {
-        String sql = "UPDATE richiesta_supporto SET stato = ?::stato_richiesta, motivazione_rifiuto = ? WHERE id = ?";
+        String sql = "UPDATE richiesta_supporto SET stato = ?, motivazione_rifiuto = ? WHERE id = ?";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

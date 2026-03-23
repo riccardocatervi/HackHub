@@ -1,26 +1,6 @@
 CREATE
 EXTENSION IF NOT EXISTS "pgcrypto";
 
-DO
-$$
-BEGIN
-CREATE TYPE stato_segnalazione AS ENUM ('PENDENTE', 'ACCETTATA', 'RIFIUTATA');
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
-
-DO
-$$
-BEGIN
-CREATE TYPE stato_richiesta AS ENUM ('PENDENTE', 'PRESA_IN_CARICO', 'RESPINTA');
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
-
-DO
-$$
-BEGIN
-CREATE TYPE stato_call AS ENUM ('PENDENTE', 'ACCETTATA', 'RIFIUTATA');
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
 
 CREATE TABLE IF NOT EXISTS utente
 (
@@ -235,11 +215,6 @@ CREATE TABLE IF NOT EXISTS hackathon
 (
     50
 ),
-    -- Team vincitore (NULL finché l'hackathon non è CONCLUSO)
-    id_team_vincitore UUID REFERENCES team
-(
-    id
-),
     -- Flag che indica se il premio è stato erogato tramite il gateway di pagamento
     premio_disbursed BOOLEAN NOT NULL DEFAULT FALSE,
     -- Vincoli di coerenza temporale
@@ -266,22 +241,6 @@ CREATE TABLE IF NOT EXISTS hackathon
 )
     );
 
--- Aggiunge le colonne di hackathon se la tabella esiste già (upgrade sicuro)
-DO
-$$
-BEGIN
-ALTER TABLE hackathon
-    ADD COLUMN id_team_vincitore UUID REFERENCES team (id);
-EXCEPTION WHEN duplicate_column THEN NULL;
-END $$;
-
-DO
-$$
-BEGIN
-ALTER TABLE hackathon
-    ADD COLUMN premio_disbursed BOOLEAN NOT NULL DEFAULT FALSE;
-EXCEPTION WHEN duplicate_column THEN NULL;
-END $$;
 
 -- Tabella di associazione N:M Hackathon ↔ Mentore
 CREATE TABLE IF NOT EXISTS hackathon_mentori
@@ -333,13 +292,9 @@ CREATE TABLE IF NOT EXISTS team
     squalificato BOOLEAN NOT NULL DEFAULT FALSE
     );
 
-DO
-$$
-BEGIN
-ALTER TABLE team
-    ADD COLUMN squalificato BOOLEAN NOT NULL DEFAULT FALSE;
-EXCEPTION WHEN duplicate_column THEN NULL;
-END $$;
+-- id_team_vincitore aggiunto dopo la creazione di team (risolve la dipendenza circolare)
+ALTER TABLE hackathon
+    ADD COLUMN IF NOT EXISTS id_team_vincitore UUID REFERENCES team (id);
 
 -- Associazione N:M Utente ↔ Team (membri accettati)
 -- Un utente può essere membro di al più un team per hackathon (vincolo applicato a livello servizio)
