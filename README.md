@@ -1,3 +1,4 @@
+![logoHackHub](https://github.com/user-attachments/assets/21fc1067-8548-4c28-b175-458cdca4616b)
 # HackHub
 
 > Piattaforma di gestione hackathon sviluppata come progetto universitario per il corso di **Ingegneria del Software** — Università di Camerino.
