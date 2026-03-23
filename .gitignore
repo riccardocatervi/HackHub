@@ -1,1 +1,158 @@
+# SISTEMA OPERATIVO (macOS & Windows)
+
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.Trashes
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# VISUAL PARADIGM
+
+# File di lock, backup e temporanei
+*.vpp.lck
+*.vpp.bak*
+*.vpp~*
+*.vpp.~*
+*.vbak
+*.vpp.old
+# Backup numerati (es. .vpp.vbak~1, ~2)
+*.vpp.vbak~*
+.memory/
+MEMORY.md
+
+# File ausiliari e di workspace
+*.vux
+.vpprefdata/
+teamwork_client/
+teamworkUser.xml
+.lock
+
+# Preferenze e Log
+.vp.*
+vp.log
+*.log
+
+# FILE SENSIBILI / CREDENZIALI
+
+# Configurazione applicazione con credenziali reali
+# (il file .example è escluso da questa regola perché ha nome diverso)
+application.properties
+application-dev.properties
+application-prod.properties
+application-local.properties
+
+# Variabili d'ambiente
+.env
+.env.*
+*.env
+
+# Chiavi private, certificati e keystore
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+*.pfx
+
+# File generici di credenziali/segreti
+secrets.properties
+*secret*.properties
+*credentials*
+
+# JAVA
+
+*.class
+*.log
+*.ctxt
+.mtj.tmp/
+
+# Archivi (escludiamo i binari)
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Log di crash della JVM
+hs_err_pid*
+replay_pid*
+
+# BUILD TOOLS
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+.gradletasknamecache
+
+# IDE (Ambienti di Sviluppo)
+
+# Visual Studio (IDE Completo)
+.vs/
+*.suo
+*.user
+
+# Visual Studio Code
+.vscode/
+.clauderules
+.claude/
+CLAUDE.md
+*.code-workspace
+.history/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse
+.metadata
+.classpath
+.project
+.settings/
+.loadpath
+bin/
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+
+
+
