@@ -68,6 +68,7 @@ application-local.properties
 secrets.properties
 *secret*.properties
 *credentials*
+!**/InvalidCredentialsException.java
 
 # JAVA
 
